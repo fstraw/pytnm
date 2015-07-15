@@ -54,7 +54,10 @@ def test_filter_barrier_receivers_from_tnm_sound_results():
 	filtered_length = len(filtered_impacts_from_snd_results)
 	nose.tools.assert_true(analysis_length >= filtered_length)
  
-def test_recs_list_compare():
-	original = b.recs_in_analysis
-	refactored = b.recs_in_analysis_test
-	nose.tools.assert_true(original == refactored)
+#def test_recs_list_compare():
+#	"""
+#	Refactored function should equal the original one
+#	"""
+#	original = b.recs_in_analysis
+#	refactored = b.recs_in_analysis_test
+#	nose.tools.assert_true(original == refactored)

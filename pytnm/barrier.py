@@ -61,22 +61,6 @@ class Analysis(object):
 		List receivers, DU, barrier reduction value, reduction goal, and
 		impact status in chosen barrier analysis
 		"""
-		reclist = self._barrecs
-		#pull recid, reduction, and design goal from barrier design table
-		recs = [(i[0].value, i[3].value, i[4].value) for i in reclist]
-		result = []
-		for rec in self.snd_rec_list:
-			for r in recs:
-				if rec[0] == r[0]:
-					result.append((rec[0], rec[1], r[1], r[2], rec[2]))
-				pass
-		return result
-	@property		
-	def recs_in_analysis_test(self):
-		"""
-		List receivers, DU, barrier reduction value, reduction goal, and
-		impact status in chosen barrier analysis
-		"""
 		barreclist = self._barrecs
 		sndreclist = self._sndrecs
 		#pull recid, reduction, and design goal from barrier design table
@@ -235,25 +219,3 @@ class Analysis(object):
                               self.feasible)
 		print "Barrier design is reasonable: {}".format(\
                               self.reasonable)
-
-#l = [
-#    ("Sheet1", "Bars1_2_3_Snd"),
-#    ("Sheet2", "Bars1_2_3_Snd"),
-#    ("Sheet3", "Bars1_2_3_Snd"),
-#    ("Sheet4", "Bars4_5_6_7_8_Snd"),
-#    ("Sheet5", "Bars4_5_6_7_8_Snd"),
-#    ("Sheet6", "Bars4_5_6_7_8_Snd"),
-#    ("Sheet7", "Bars4_5_6_7_8_Snd"),
-#    ("Sheet8", "Bars4_5_6_7_8_Snd"),
-#    ]
-#wbname = "./tests/test_files/test.xlsx"
-#for bar in l:
-#    print "Barrier {}".format(l.index(bar) + 1)
-#    b = Analysis(wbname, bar[0], bar[1])
-#    b.report()
-#    print ("-"*20)
-
-wbname = r"U:\Brandon Batt\!!!ICE1401\CompletedRuns\Barrier_Analysis.xlsx"
-
-b = Analysis(wbname, "Bar20_Analysis", "Bar20_21Snd")
-b.report()
