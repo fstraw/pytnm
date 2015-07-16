@@ -72,9 +72,9 @@ class Analysis(object):
 				if rec == sndrec[0].value:
 					du = sndrec[2].value
 					impstat = sndrec[8].value
-					r.append((rec, du, barred, redial, impstat))
-                                else:
-				        pass
+					r.append((rec, du, barred, redgoal, impstat))
+				
+					pass
 		return r
 	@property
 	def du_in_analysis(self):
