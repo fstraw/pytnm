@@ -72,7 +72,7 @@ class Analysis(object):
 				if rec == sndrec[0].value:
 					du = sndrec[2].value
 					impstat = sndrec[8].value
-					r.append((rec, du, barred, redial, impstat))
+					r.append((rec, du, barred, redgoal, impstat))
                                 else:
 				        pass
 		return r
