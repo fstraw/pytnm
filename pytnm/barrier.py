@@ -63,8 +63,6 @@ class Analysis(object):
 		"""
 		barreclist = self._barrecs
 		sndreclist = self._sndrecs
-		#pull recid, reduction, and design goal from barrier design table
-#		recs = [(i[0].value, i[3].value, i[4].value) for i in reclist]
 		r = []
 		for barrec in barreclist:
 			rec = barrec[0].value
@@ -74,8 +72,9 @@ class Analysis(object):
 				if rec == sndrec[0].value:
 					du = sndrec[2].value
 					impstat = sndrec[8].value
-					r.append((rec, du, barred, redgoal, impstat))
-				pass
+					r.append((rec, du, barred, redial, impstat))
+                                else:
+				        pass
 		return r
 	@property
 	def du_in_analysis(self):
