@@ -1,18 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jul 11 11:14:37 2015
-
 Purpose: Quickly assess the feasibility and reasonableness 
 of a given barrier design, given a reduction design goal,
 a reasonable cost, and any other state-specific criteria
-
-@author: Brandon
 """
 
 import openpyxl as p
 
 
 class Analysis(object):
+	"""Barrier analysis class
+	
+	This class will contain several read-only properties
+	that will aid in documenting the feasibility and 
+	reasonableness of a given barrier design modelled in the FHWA
+	TNM 2.5. Information is pulled from an ".xlsx" wb of any name 
+	with the assumption	that the Barrier Design Table results and
+	Sound Level Results tables are copied AS-IS directly from TNM 2.5
+	to two separate worksheets in the ".xlsx" workbook.
+	
+	- **parameters**
+	:param wbname: ".xlsx" file on disk (i.g. "Barriers.xlsx")
+	:param barsheet: worksheet in ".xlsx" containing Barrier Design Table
+	:param sndsheet: "worksheet in ".xlsx" containing Sound Level Results
+	:param barriercost: cost of barrier design, as reported by TNM 2.5
+	"""
+
 	def __init__(self, wbname, barsheet, sndsheet, barcost=None):
 		self._wbname = wbname
 		self._barsheet = barsheet
@@ -73,13 +86,8 @@ class Analysis(object):
 					du = sndrec[2].value
 					impstat = sndrec[8].value
 					r.append((rec, du, barred, redgoal, impstat))
-<<<<<<< HEAD
-                                else:
-				        pass
-=======
-				
+				else:
 					pass
->>>>>>> origin/master
 		return r
 	@property
 	def du_in_analysis(self):
@@ -219,4 +227,4 @@ class Analysis(object):
 		print "Barrier design is feasible: {}".format(\
                               self.feasible)
 		print "Barrier design is reasonable: {}".format(\
-                              self.reasonable)
+                              self.reasonable)	  
