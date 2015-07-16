@@ -177,10 +177,8 @@ class Analysis(object):
 		perc_crit = self.impact_num * 0.75
 		if self.benefit_num >= perc_crit:
 			return True
-#			return perc_crit
 		else:
 			return False
-#			return perc_crit
 	@property
 	def reasonable(self):
 		"""
@@ -192,10 +190,9 @@ class Analysis(object):
 			return False
 		elif self.reas_red_num >= perc_crit:
 			return True
-#			return perc_crit
 		else:
 			return False
-#			return perc_crit
+
 	def report(self):
 		"""
 		Report of results. Useful for report writing or debugging.
