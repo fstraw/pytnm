@@ -205,7 +205,15 @@ class Analysis(object):
 			return True
 		else:
 			return False
-
+	def cost_per_benefit(self):
+		"""
+		If a barrier cost has been specified, returns the cost per 
+		benefitted receptor based on the policy-specific allowable cost
+		"""
+		if self.barriercost <= 0:
+		    raise ValueError("Must specify a barrier design cost!")
+		else:
+		    return self.barriercost / self.benefit_num
 	def report(self):
 		"""
 		Report of results. Useful for report writing or debugging.

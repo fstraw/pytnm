@@ -53,7 +53,15 @@ def test_filter_barrier_receivers_from_tnm_sound_results():
 	analysis_length = len(analysis_receivers)
 	filtered_length = len(filtered_impacts_from_snd_results)
 	nose.tools.assert_true(analysis_length >= filtered_length)
- 
+
+def test_cost_per_benefit_method_requires_barrier_cost():
+    """
+    Because barrier cost is an optional parameter, it will be
+    easy to forget if this information is required.
+    """
+    b.barriercost = 0    
+    nose.tools.assert_raises(ValueError, b.cost_per_benefit)
+
 #def test_recs_list_compare():
 #	"""
 #	Refactored function should equal the original one
