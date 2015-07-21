@@ -13,9 +13,9 @@ class Analysis(object):
 	
 	This class will contain several read-only properties
 	that will aid in documenting the feasibility and 
-	reasonableness of a given barrier design modelled in the FHWA
+	reasonableness of a given barrier design modeled in the FHWA
 	TNM 2.5. Information is pulled from an ".xlsx" wb of any name 
-	with the assumption	that the Barrier Design Table results and
+	with the assumption that the Barrier Design Table results and
 	Sound Level Results tables are copied AS-IS directly from TNM 2.5
 	to two separate worksheets in the ".xlsx" workbook.
 	
@@ -92,7 +92,7 @@ class Analysis(object):
 	@property
 	def du_in_analysis(self):
 		"""
-		Number of receptors in this analysis 
+		Number of receptors in the barrier analysis worksheet (barheet) 
 		"""
 		dulist = [tup[1] for tup in self.recs_in_analysis]
 		return sum(dulist)
@@ -226,11 +226,11 @@ class Analysis(object):
                               len(self.benefitted), self.benefit_num)
 		print "Number of impacts receiving 5dBA reduction: {}".format(\
                               self.ben_and_imp_num)
-		print "%  of impacts receiving 5dBA reduction: {}".format(\
+		print "Impacts (%) receiving 5dBA reduction: {}".format(\
                               self.perc_imp_benefitted)
-		print "Number of benefits receiving 8dBA reduction: {} ({})".format(\
+		print "Benefits receiving 8dBA reduction: {} ({})".format(\
                               len(self.reas_red_recs), self.reas_red_num) 
-		print "%  of benefits receiving reasonable reduction: {}".format(\
+		print "Benefits (%) receiving reasonable reduction: {}".format(\
                               self.perc_ben_reasonable) 
 		print "Barrier design is feasible: {}".format(\
                               self.feasible)
