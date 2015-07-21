@@ -62,6 +62,10 @@ def test_cost_per_benefit_method_requires_barrier_cost():
     b.barriercost = 0    
     nose.tools.assert_raises(ValueError, b.cost_per_benefit)
 
+def test_user_can_change_du():
+    b.du_analysis = 5
+    nose.tools.assert_true(b.du_analysis == 5)
+
 #def test_recs_list_compare():
 #	"""
 #	Refactored function should equal the original one

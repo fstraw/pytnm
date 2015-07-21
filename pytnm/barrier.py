@@ -35,6 +35,16 @@ class Analysis(object):
 		self.barriercost = barcost
 		self._barrecs = self._wbhandler(barsheet)
 		self._sndrecs = self._wbhandler(sndsheet)
+		self.snd_rec_list = [
+                                  (i[0].value, i[2].value, i[8].value) 
+                                  for i in self._sndrecs
+                               ]
+		self.du_analysis = sum([tup[1] for tup in self.recs_in_analysis])
+		self.ben_and_imp = [
+                                  (i[0], i[1]) for i in self.recs_in_analysis 
+                                  if i[2] >= 5 and i[4] != " ----"
+                               ]
+		self.ben_and_imp_num = sum(self.ben_and_imp)
 	def _wbhandler(self, sht):
 		"""
 		Load Excel workbook and generate appropriate receiver list
@@ -55,19 +65,19 @@ class Analysis(object):
 			datarange = 'B20:N{}'.format(lastrow)
 		reclist = list(ws.iter_rows(range_string=datarange))
 		return reclist
-	@property
-	def snd_rec_list(self):
-		"""
-		Return list of receivers, DUs, and impact status
-		from TNM Sound Results table
-		
-		Depending on TNM model setup, this may not match the receivers
-		included in the barrier analysis.
-		"""
-		reclist = self._sndrecs
-		#pull recid, reduction, and design goal from table
-		result = [(i[0].value, i[2].value, i[8].value) for i in reclist]
-		return result
+#	@property
+#	def snd_rec_list(self):
+#		"""
+#		Return list of receivers, DUs, and impact status
+#		from TNM Sound Results table
+#		
+#		Depending on TNM model setup, this may not match the receivers
+#		included in the barrier analysis.
+#		"""
+#		reclist = self._sndrecs
+#		#pull recid, reduction, and design goal from table
+#		result = [(i[0].value, i[2].value, i[8].value) for i in reclist]
+#		return result
 	@property		
 	def recs_in_analysis(self):
 		"""
@@ -89,23 +99,16 @@ class Analysis(object):
 				else:
 					pass
 		return r
-	@property
-	def du_in_analysis(self):
-		"""
-		Number of receptors in the barrier analysis worksheet (barheet) 
-		"""
-		dulist = [tup[1] for tup in self.recs_in_analysis]
-		return sum(dulist)
-	@property
-	def ben_and_imp(self):
-		"""
-		List of impacted receivers in this analysis 
-		that are benefitted (<= 5dBA)
-		"""
-		reclist = self.recs_in_analysis
-		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5
-                          and item[4] != " ----"]
-		return benefits
+#	@property
+#	def ben_and_imp(self):
+#		"""
+#		List of impacted receivers in this analysis 
+#		that are benefitted (<= 5dBA)
+#		"""
+#		reclist = self.recs_in_analysis
+#		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5
+#                          and item[4] != " ----"]
+#		return benefits
 	@property
 	def benefitted(self):
 		"""
@@ -146,14 +149,14 @@ class Analysis(object):
 		"""
 		dulist = [tup[1] for tup in self.benefitted]
 		return sum(dulist)
-	@property
-	def ben_and_imp_num(self):
-		"""
-		Return number of benefitted and impacted receptors 
-		in barrier analysis
-		"""
-		dulist = [tup[1] for tup in self.ben_and_imp]
-		return sum(dulist)
+#	@property
+#	def ben_and_imp_num(self):
+#		"""
+#		Return number of benefitted and impacted receptors 
+#		in barrier analysis
+#		"""
+#		dulist = [tup[1] for tup in self.ben_and_imp]
+#		return sum(dulist)
 	@property
 	def reas_red_num(self):
 		"""
