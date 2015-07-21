@@ -44,7 +44,7 @@ class Analysis(object):
                                   (i[0], i[1]) for i in self.recs_in_analysis 
                                   if i[2] >= 5 and i[4] != " ----"
                                ]
-		self.ben_and_imp_num = sum(self.ben_and_imp)
+		self.ben_and_imp_num = sum([tup[1] for tup in self.ben_and_imp])
 	def _wbhandler(self, sht):
 		"""
 		Load Excel workbook and generate appropriate receiver list
