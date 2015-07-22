@@ -40,6 +40,10 @@ class Analysis(object):
                                   for i in self._sndrecs
                                ]
 		self.du_analysis = sum([tup[1] for tup in self.recs_in_analysis])
+		self.benefitted = [
+                                  (i[0], i[1]) for i in self.recs_in_analysis 
+                                  if i[2] >= 5
+                              ]
 		self.ben_and_imp = [
                                   (i[0], i[1]) for i in self.recs_in_analysis 
                                   if i[2] >= 5 and i[4] != " ----"
@@ -109,14 +113,14 @@ class Analysis(object):
 #		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5
 #                          and item[4] != " ----"]
 #		return benefits
-	@property
-	def benefitted(self):
-		"""
-		List any receivers in this analysis that are benefitted (<= 5dBA)
-		"""
-		reclist = self.recs_in_analysis
-		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5]
-		return benefits
+#	@property
+#	def benefitted(self):
+#		"""
+#		List any receivers in this analysis that are benefitted (<= 5dBA)
+#		"""
+#		reclist = self.recs_in_analysis
+#		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5]
+#		return benefits
 	@property
 	def reas_red_recs(self):
 		"""
@@ -214,7 +218,7 @@ class Analysis(object):
 		benefitted receptor based on the policy-specific allowable cost
 		"""
 		if self.barriercost <= 0:
-		    raise ValueError("Must specify a barrier design cost!")
+		    return 0
 		else:
 		    return self.barriercost / self.benefit_num
 	def report(self):
