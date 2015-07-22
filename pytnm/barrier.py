@@ -42,6 +42,7 @@ class Analysis(object):
 		self.impacted_recs = [(i[0], i[1]) for i in self.recs_in_analysis 
                                       if i[4] != " ----"
                                 ]
+		self.impact_num = sum([tup[1] for tup in self.impacted_recs])
 		self.du_analysis = sum([tup[1] for tup in self.recs_in_analysis])
 		self.benefitted =  [
                                   (i[0], i[1]) for i in self.recs_in_analysis 
