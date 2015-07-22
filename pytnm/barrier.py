@@ -48,6 +48,7 @@ class Analysis(object):
                                   (i[0], i[1]) for i in self.recs_in_analysis 
                                       if i[2] >= 5
                               ]
+		self.benefit_num = sum([tup[1] for tup in self.benefitted])
 		self.ben_and_imp = [
                                   (i[0], i[1]) for i in self.recs_in_analysis 
                                       if i[2] >= 5 and i[4] != " ----"
@@ -57,6 +58,7 @@ class Analysis(object):
                                   (i[0], i[1]) for i in self.recs_in_analysis
                                       if i[2] >= i[3]
                                 ]
+		self.reas_red_num = sum([tup[1] for tup in self.reas_red_recs])
 	def _wbhandler(self, sht):
 		"""
 		Load Excel workbook and generate appropriate receiver list
@@ -147,20 +149,20 @@ class Analysis(object):
 #		reclist = self.recs_in_analysis
 #		result = [(i[0], i[1]) for i in reclist if i[4] != " ----"]
 #		return result
-	@property
-	def impact_num(self):
-		"""
-		Return number of impacted receptors in barrier analysis
-		"""
-		dulist = [tup[1] for tup in self.impacted_recs]
-		return sum(dulist)
-	@property
-	def benefit_num(self):
-		"""
-		Return number of benefitted receptors in barrier analysis
-		"""
-		dulist = [tup[1] for tup in self.benefitted]
-		return sum(dulist)
+#	@property
+#	def impact_num(self):
+#		"""
+#		Return number of impacted receptors in barrier analysis
+#		"""
+#		dulist = [tup[1] for tup in self.impacted_recs]
+#		return sum(dulist)
+#	@property
+#	def benefit_num(self):
+#		"""
+#		Return number of benefitted receptors in barrier analysis
+#		"""
+#		dulist = [tup[1] for tup in self.benefitted]
+#		return sum(dulist)
 #	@property
 #	def ben_and_imp_num(self):
 #		"""
@@ -169,14 +171,14 @@ class Analysis(object):
 #		"""
 #		dulist = [tup[1] for tup in self.ben_and_imp]
 #		return sum(dulist)
-	@property
-	def reas_red_num(self):
-		"""
-		Return number of benefitted receptors in barrier analysis
-		that are receiving a reasonable noise reduction
-		"""
-		dulist = [tup[1] for tup in self.reas_red_recs]
-		return sum(dulist)
+#	@property
+#	def reas_red_num(self):
+#		"""
+#		Return number of benefitted receptors in barrier analysis
+#		that are receiving a reasonable noise reduction
+#		"""
+#		dulist = [tup[1] for tup in self.reas_red_recs]
+#		return sum(dulist)
 	@property
 	def perc_imp_benefitted(self):
 		"""
