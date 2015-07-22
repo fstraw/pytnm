@@ -21,7 +21,7 @@ import shlex
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 
-sys.path.insert(0,"C:\\Users\\bbatt\\Dropbox\\!Python\\pytnm\\pytnm")
+sys.path.insert(0,"C:\\Users\\Brandon\\Dropbox\\!Python\\pytnm\\pytnm")
 
 # -- General configuration ------------------------------------------------
 

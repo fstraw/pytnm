@@ -19,7 +19,6 @@ class Analysis(object):
 	Sound Level Results tables are copied AS-IS directly from TNM 2.5
 	to two separate worksheets in the ".xlsx" workbook.
 	
-	- **parameters**
 	:param wbname: ".xlsx" file on disk (i.g. "Barriers.xlsx")
 	:param barsheet: worksheet in ".xlsx" containing Barrier Design Table
 	:param sndsheet: "worksheet in ".xlsx" containing Sound Level Results
@@ -35,6 +34,7 @@ class Analysis(object):
 		self.barriercost = barcost
 		self._barrecs = self._wbhandler(barsheet)
 		self._sndrecs = self._wbhandler(sndsheet)
+		"""Receivers listed in the Sound Results worksheet"""
 		self.snd_rec_list = [
                                   (i[0].value, i[2].value, i[8].value) 
                                       for i in self._sndrecs
