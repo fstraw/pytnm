@@ -174,8 +174,3 @@ class Analysis(object):
                               self.feasible)
 		print "Barrier design is reasonable: {}".format(\
                               self.reasonable)
-
-wb = r"C:\Users\Brandon\Dropbox\!Python\pytnm\tests\test_files\test.xlsx"
-barsheet = "Sheet7"
-sndsheet = "Bars4_5_6_7_8_Snd"
-b = Analysis(wb, barsheet, sndsheet)
