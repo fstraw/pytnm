@@ -49,6 +49,10 @@ class Analysis(object):
                                   if i[2] >= 5 and i[4] != " ----"
                                ]
 		self.ben_and_imp_num = sum([tup[1] for tup in self.ben_and_imp])
+		self.reas_red_recs = [
+                                  (i[0], i[1]) for i in self.recs_in_analysis
+                                      if i[2] >= i[3]
+                                ]
 	def _wbhandler(self, sht):
 		"""
 		Load Excel workbook and generate appropriate receiver list
@@ -121,16 +125,16 @@ class Analysis(object):
 #		reclist = self.recs_in_analysis
 #		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5]
 #		return benefits
-	@property
-	def reas_red_recs(self):
-		"""
-		List receivers from this barrier analysis that are receiving
-		a reasonable noise reduction, as determined by the noise reduction
-		design goal
-		"""
-		reclist = self.recs_in_analysis
-		reasredlist = [(i[0], i[1]) for i in reclist if i[2] >= i[3]]
-		return reasredlist
+#	@property
+#	def reas_red_recs(self):
+#		"""
+#		List receivers from this barrier analysis that are receiving
+#		a reasonable noise reduction, as determined by the noise reduction
+#		design goal
+#		"""
+#		reclist = self.recs_in_analysis
+#		reasredlist = [(i[0], i[1]) for i in reclist if i[2] >= i[3]]
+#		return reasredlist
 	@property
 	def impacted_recs(self):
 		"""
