@@ -26,7 +26,7 @@ class Analysis(object):
 	:param barriercost: cost of barrier design, as reported by TNM 2.5
 	"""
 
-	def __init__(self, wbname, barsheet, sndsheet, barcost=None):
+	def __init__(self, wbname, barsheet, sndsheet, barcost=0):
 		self._wbname = wbname
 		self._barsheet = barsheet
 		self._sndsheet = sndsheet
@@ -39,23 +39,23 @@ class Analysis(object):
                                   (i[0].value, i[2].value, i[8].value) 
                                       for i in self._sndrecs
                                ]
-		self.impacted_recs = [(i[0], i[1]) for i in self.recs_in_analysis 
+		self.impacted_recs = [(i[0], i[1]) for i in self.recs_analysis 
                                       if i[4] != " ----"
                                 ]
 		self.impact_num = sum([tup[1] for tup in self.impacted_recs])
-		self.du_analysis = sum([tup[1] for tup in self.recs_in_analysis])
+		self.du_analysis = sum([tup[1] for tup in self.recs_analysis])
 		self.benefitted =  [
-                                  (i[0], i[1]) for i in self.recs_in_analysis 
+                                  (i[0], i[1]) for i in self.recs_analysis 
                                       if i[2] >= 5
                               ]
 		self.benefit_num = sum([tup[1] for tup in self.benefitted])
 		self.ben_and_imp = [
-                                  (i[0], i[1]) for i in self.recs_in_analysis 
+                                  (i[0], i[1]) for i in self.recs_analysis 
                                       if i[2] >= 5 and i[4] != " ----"
                                ]
 		self.ben_and_imp_num = sum([tup[1] for tup in self.ben_and_imp])
 		self.reas_red_recs = [
-                                  (i[0], i[1]) for i in self.recs_in_analysis
+                                  (i[0], i[1]) for i in self.recs_analysis
                                       if i[2] >= i[3]
                                 ]
 		self.reas_red_num = sum([tup[1] for tup in self.reas_red_recs])
@@ -93,7 +93,7 @@ class Analysis(object):
 #		result = [(i[0].value, i[2].value, i[8].value) for i in reclist]
 #		return result
 	@property		
-	def recs_in_analysis(self):
+	def recs_analysis(self):
 		"""
 		List receivers, DU, barrier reduction value, reduction goal, and
 		impact status in chosen barrier analysis
@@ -112,14 +112,14 @@ class Analysis(object):
 					r.append((rec, du, barred, redgoal, impstat))
 				else:
 					pass
-		return r
+		return sorted(r)
 #	@property
 #	def ben_and_imp(self):
 #		"""
 #		List of impacted receivers in this analysis 
 #		that are benefitted (<= 5dBA)
 #		"""
-#		reclist = self.recs_in_analysis
+#		reclist = self.recs_analysis
 #		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5
 #                          and item[4] != " ----"]
 #		return benefits
@@ -128,7 +128,7 @@ class Analysis(object):
 #		"""
 #		List any receivers in this analysis that are benefitted (<= 5dBA)
 #		"""
-#		reclist = self.recs_in_analysis
+#		reclist = self.recs_analysis
 #		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5]
 #		return benefits
 #	@property
@@ -138,7 +138,7 @@ class Analysis(object):
 #		a reasonable noise reduction, as determined by the noise reduction
 #		design goal
 #		"""
-#		reclist = self.recs_in_analysis
+#		reclist = self.recs_analysis
 #		reasredlist = [(i[0], i[1]) for i in reclist if i[2] >= i[3]]
 #		return reasredlist
 #	@property
@@ -146,7 +146,7 @@ class Analysis(object):
 #		"""
 #		List impacted receivers that are part of this barrier analysis
 #		"""
-#		reclist = self.recs_in_analysis
+#		reclist = self.recs_analysis
 #		result = [(i[0], i[1]) for i in reclist if i[4] != " ----"]
 #		return result
 #	@property
@@ -236,7 +236,7 @@ class Analysis(object):
 		Report of results. Useful for report writing or debugging.
 		"""
 		print "Receivers/receptors in barrier analysis: {} ({})".format(\
-                              len(self.recs_in_analysis), self.du_in_analysis)
+                              len(self.recs_analysis), self.du_analysis)
 		print "Impacts in barrier analysis: {} ({})".format(\
                               len(self.impacted_recs), self.impact_num)
 		print "Benefits in barrier analysis: {} ({})".format(\
@@ -252,4 +252,9 @@ class Analysis(object):
 		print "Barrier design is feasible: {}".format(\
                               self.feasible)
 		print "Barrier design is reasonable: {}".format(\
-                              self.reasonable)	  
+                              self.reasonable)
+
+wb = r"C:\Users\Brandon\Dropbox\!Python\pytnm\tests\test_files\test.xlsx"
+barsheet = "Sheet7"
+sndsheet = "Bars4_5_6_7_8_Snd"
+b = Analysis(wb, barsheet, sndsheet)

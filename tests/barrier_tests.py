@@ -54,17 +54,32 @@ def test_filter_barrier_receivers_from_tnm_sound_results():
 	filtered_length = len(filtered_impacts_from_snd_results)
 	nose.tools.assert_true(analysis_length >= filtered_length)
 
-def test_cost_per_benefit_method_requires_barrier_cost():
-    """
-    Because barrier cost is an optional parameter, it will be
-    easy to forget if this information is required.
-    """
-    b.barriercost = 0    
-    nose.tools.assert_raises(ValueError, b.cost_per_benefit)
+#def test_cost_per_benefit_method_requires_barrier_cost():
+#    """
+#    Because barrier cost is an optional parameter, it will be
+#    easy to forget if this information is required.
+#    """
+#    b.barriercost = 0    
+#    nose.tools.assert_raises(ValueError, b.cost_per_benefit)
 
 def test_user_can_change_du():
     b.du_analysis = 5
     nose.tools.assert_true(b.du_analysis == 5)
+
+def test_vals_correct_from_known_test_xlsx():
+    bsheet = "Sheet7"
+    ssheet = "Bars4_5_6_7_8_Snd"
+    b = Analysis(wbname, bsheet, ssheet)
+    nose.tools.assert_true(len(b.recs_analysis) == 8)
+    nose.tools.assert_true(len(b.impacted_recs) == 3)
+    nose.tools.assert_true(b.impact_num == 6)
+    nose.tools.assert_true(b.du_analysis == 15)
+    nose.tools.assert_true(len(b.benefitted) == 6)
+    nose.tools.assert_true(b.benefit_num == 11)
+    nose.tools.assert_true(len(b.ben_and_imp) == 3)
+    nose.tools.assert_true(b.ben_and_imp_num == 6)
+    nose.tools.assert_true(len(b.reas_red_recs) == 2)
+    nose.tools.assert_true(b.reas_red_num == 4)
 
 #def test_recs_list_compare():
 #	"""
