@@ -79,19 +79,6 @@ class Analysis(object):
 			datarange = 'B20:N{}'.format(lastrow)
 		reclist = list(ws.iter_rows(range_string=datarange))
 		return reclist
-#	@property
-#	def snd_rec_list(self):
-#		"""
-#		Return list of receivers, DUs, and impact status
-#		from TNM Sound Results table
-#		
-#		Depending on TNM model setup, this may not match the receivers
-#		included in the barrier analysis.
-#		"""
-#		reclist = self._sndrecs
-#		#pull recid, reduction, and design goal from table
-#		result = [(i[0].value, i[2].value, i[8].value) for i in reclist]
-#		return result
 	@property		
 	def recs_analysis(self):
 		"""
@@ -113,72 +100,6 @@ class Analysis(object):
 				else:
 					pass
 		return sorted(r)
-#	@property
-#	def ben_and_imp(self):
-#		"""
-#		List of impacted receivers in this analysis 
-#		that are benefitted (<= 5dBA)
-#		"""
-#		reclist = self.recs_analysis
-#		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5
-#                          and item[4] != " ----"]
-#		return benefits
-#	@property
-#	def benefitted(self):
-#		"""
-#		List any receivers in this analysis that are benefitted (<= 5dBA)
-#		"""
-#		reclist = self.recs_analysis
-#		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5]
-#		return benefits
-#	@property
-#	def reas_red_recs(self):
-#		"""
-#		List receivers from this barrier analysis that are receiving
-#		a reasonable noise reduction, as determined by the noise reduction
-#		design goal
-#		"""
-#		reclist = self.recs_analysis
-#		reasredlist = [(i[0], i[1]) for i in reclist if i[2] >= i[3]]
-#		return reasredlist
-#	@property
-#	def impacted_recs(self):
-#		"""
-#		List impacted receivers that are part of this barrier analysis
-#		"""
-#		reclist = self.recs_analysis
-#		result = [(i[0], i[1]) for i in reclist if i[4] != " ----"]
-#		return result
-#	@property
-#	def impact_num(self):
-#		"""
-#		Return number of impacted receptors in barrier analysis
-#		"""
-#		dulist = [tup[1] for tup in self.impacted_recs]
-#		return sum(dulist)
-#	@property
-#	def benefit_num(self):
-#		"""
-#		Return number of benefitted receptors in barrier analysis
-#		"""
-#		dulist = [tup[1] for tup in self.benefitted]
-#		return sum(dulist)
-#	@property
-#	def ben_and_imp_num(self):
-#		"""
-#		Return number of benefitted and impacted receptors 
-#		in barrier analysis
-#		"""
-#		dulist = [tup[1] for tup in self.ben_and_imp]
-#		return sum(dulist)
-#	@property
-#	def reas_red_num(self):
-#		"""
-#		Return number of benefitted receptors in barrier analysis
-#		that are receiving a reasonable noise reduction
-#		"""
-#		dulist = [tup[1] for tup in self.reas_red_recs]
-#		return sum(dulist)
 	@property
 	def perc_imp_benefitted(self):
 		"""

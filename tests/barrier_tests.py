@@ -80,11 +80,3 @@ def test_vals_correct_from_known_test_xlsx():
     nose.tools.assert_true(b.ben_and_imp_num == 6)
     nose.tools.assert_true(len(b.reas_red_recs) == 2)
     nose.tools.assert_true(b.reas_red_num == 4)
-
-#def test_recs_list_compare():
-#	"""
-#	Refactored function should equal the original one
-#	"""
-#	original = b.recs_in_analysis
-#	refactored = b.recs_in_analysis_test
-#	nose.tools.assert_true(original == refactored)
