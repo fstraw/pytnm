@@ -37,16 +37,19 @@ class Analysis(object):
 		self._sndrecs = self._wbhandler(sndsheet)
 		self.snd_rec_list = [
                                   (i[0].value, i[2].value, i[8].value) 
-                                  for i in self._sndrecs
+                                      for i in self._sndrecs
                                ]
+		self.impacted_recs = [(i[0], i[1]) for i in self.recs_in_analysis 
+                                      if i[4] != " ----"
+                                ]
 		self.du_analysis = sum([tup[1] for tup in self.recs_in_analysis])
-		self.benefitted = [
+		self.benefitted =  [
                                   (i[0], i[1]) for i in self.recs_in_analysis 
-                                  if i[2] >= 5
+                                      if i[2] >= 5
                               ]
 		self.ben_and_imp = [
                                   (i[0], i[1]) for i in self.recs_in_analysis 
-                                  if i[2] >= 5 and i[4] != " ----"
+                                      if i[2] >= 5 and i[4] != " ----"
                                ]
 		self.ben_and_imp_num = sum([tup[1] for tup in self.ben_and_imp])
 		self.reas_red_recs = [
@@ -135,14 +138,14 @@ class Analysis(object):
 #		reclist = self.recs_in_analysis
 #		reasredlist = [(i[0], i[1]) for i in reclist if i[2] >= i[3]]
 #		return reasredlist
-	@property
-	def impacted_recs(self):
-		"""
-		List impacted receivers that are part of this barrier analysis
-		"""
-		reclist = self.recs_in_analysis
-		result = [(i[0], i[1]) for i in reclist if i[4] != " ----"]
-		return result
+#	@property
+#	def impacted_recs(self):
+#		"""
+#		List impacted receivers that are part of this barrier analysis
+#		"""
+#		reclist = self.recs_in_analysis
+#		result = [(i[0], i[1]) for i in reclist if i[4] != " ----"]
+#		return result
 	@property
 	def impact_num(self):
 		"""
