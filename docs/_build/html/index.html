@@ -43,25 +43,20 @@
 <ul class="simple">
 </ul>
 </div>
-<span class="target" id="module-barrier"></span><p>Created on Sat Jul 11 11:14:37 2015</p>
-<p>Purpose: Quickly assess the feasibility and reasonableness 
+<span class="target" id="module-barrier"></span><p>Purpose: Quickly assess the feasibility and reasonableness 
 of a given barrier design, given a reduction design goal,
 a reasonable cost, and any other state-specific criteria</p>
-<p>&#64;author: Brandon</p>
 <dl class="class">
 <dt id="barrier.Analysis">
-<em class="property">class </em><code class="descclassname">barrier.</code><code class="descname">Analysis</code><span class="sig-paren">(</span><em>wbname</em>, <em>barsheet</em>, <em>sndsheet</em>, <em>barcost=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/barrier.html#Analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#barrier.Analysis" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">barrier.</code><code class="descname">Analysis</code><span class="sig-paren">(</span><em>wbname</em>, <em>barsheet</em>, <em>sndsheet</em>, <em>barcost=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/barrier.html#Analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#barrier.Analysis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Barrier analysis class</p>
 <p>This class will contain several read-only properties
 that will aid in documenting the feasibility and 
-reasonableness of a given barrier design modelled in the FHWA
+reasonableness of a given barrier design modeled in the FHWA
 TNM 2.5. Information is pulled from an &#8221;.xlsx&#8221; wb of any name 
-with the assumption     that the Barrier Design Table results and
+with the assumption that the Barrier Design Table results and
 Sound Level Results tables are copied AS-IS directly from TNM 2.5
 to two separate worksheets in the &#8221;.xlsx&#8221; workbook.</p>
-<ul class="simple">
-<li><strong>parameters</strong></li>
-</ul>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -76,36 +71,11 @@ to two separate worksheets in the &#8221;.xlsx&#8221; workbook.</p>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
-<dt id="barrier.Analysis.ben_and_imp">
-<code class="descname">ben_and_imp</code><a class="headerlink" href="#barrier.Analysis.ben_and_imp" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of impacted receivers in this analysis 
-that are benefitted (&lt;= 5dBA)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="barrier.Analysis.ben_and_imp_num">
-<code class="descname">ben_and_imp_num</code><a class="headerlink" href="#barrier.Analysis.ben_and_imp_num" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return number of benefitted and impacted receptors 
-in barrier analysis</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="barrier.Analysis.benefit_num">
-<code class="descname">benefit_num</code><a class="headerlink" href="#barrier.Analysis.benefit_num" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return number of benefitted receptors in barrier analysis</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="barrier.Analysis.benefitted">
-<code class="descname">benefitted</code><a class="headerlink" href="#barrier.Analysis.benefitted" title="Permalink to this definition">¶</a></dt>
-<dd><p>List any receivers in this analysis that are benefitted (&lt;= 5dBA)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="barrier.Analysis.du_in_analysis">
-<code class="descname">du_in_analysis</code><a class="headerlink" href="#barrier.Analysis.du_in_analysis" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of receptors in this analysis</p>
+<dl class="method">
+<dt id="barrier.Analysis.cost_per_benefit">
+<code class="descname">cost_per_benefit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/barrier.html#Analysis.cost_per_benefit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#barrier.Analysis.cost_per_benefit" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a barrier cost has been specified, returns the cost per 
+benefitted receptor based on the policy-specific allowable cost</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -113,18 +83,6 @@ in barrier analysis</p>
 <code class="descname">feasible</code><a class="headerlink" href="#barrier.Analysis.feasible" title="Permalink to this definition">¶</a></dt>
 <dd><p>Barrier design is feasible if 75% or more of impacted receivers
 receive a 5dBA or more noise reduction</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="barrier.Analysis.impact_num">
-<code class="descname">impact_num</code><a class="headerlink" href="#barrier.Analysis.impact_num" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return number of impacted receptors in barrier analysis</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="barrier.Analysis.impacted_recs">
-<code class="descname">impacted_recs</code><a class="headerlink" href="#barrier.Analysis.impacted_recs" title="Permalink to this definition">¶</a></dt>
-<dd><p>List impacted receivers that are part of this barrier analysis</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -142,21 +100,6 @@ receive a 5 dBA reduction</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="barrier.Analysis.reas_red_num">
-<code class="descname">reas_red_num</code><a class="headerlink" href="#barrier.Analysis.reas_red_num" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return number of benefitted receptors in barrier analysis
-that are receiving a reasonable noise reduction</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="barrier.Analysis.reas_red_recs">
-<code class="descname">reas_red_recs</code><a class="headerlink" href="#barrier.Analysis.reas_red_recs" title="Permalink to this definition">¶</a></dt>
-<dd><p>List receivers from this barrier analysis that are receiving
-a reasonable noise reduction, as determined by the noise reduction
-design goal</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="barrier.Analysis.reasonable">
 <code class="descname">reasonable</code><a class="headerlink" href="#barrier.Analysis.reasonable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Barrier design is reasonable if 80% or more of benefitted receivers
@@ -164,8 +107,8 @@ receive a 8dBA or more noise reduction</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="barrier.Analysis.recs_in_analysis">
-<code class="descname">recs_in_analysis</code><a class="headerlink" href="#barrier.Analysis.recs_in_analysis" title="Permalink to this definition">¶</a></dt>
+<dt id="barrier.Analysis.recs_analysis">
+<code class="descname">recs_analysis</code><a class="headerlink" href="#barrier.Analysis.recs_analysis" title="Permalink to this definition">¶</a></dt>
 <dd><p>List receivers, DU, barrier reduction value, reduction goal, and
 impact status in chosen barrier analysis</p>
 </dd></dl>
@@ -174,15 +117,6 @@ impact status in chosen barrier analysis</p>
 <dt id="barrier.Analysis.report">
 <code class="descname">report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/barrier.html#Analysis.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#barrier.Analysis.report" title="Permalink to this definition">¶</a></dt>
 <dd><p>Report of results. Useful for report writing or debugging.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="barrier.Analysis.snd_rec_list">
-<code class="descname">snd_rec_list</code><a class="headerlink" href="#barrier.Analysis.snd_rec_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return list of receivers, DUs, and impact status
-from TNM Sound Results table</p>
-<p>Depending on TNM model setup, this may not match the receivers
-included in the barrier analysis.</p>
 </dd></dl>
 
 </dd></dl>

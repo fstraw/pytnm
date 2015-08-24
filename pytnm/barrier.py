@@ -13,20 +13,19 @@ class Analysis(object):
 	
 	This class will contain several read-only properties
 	that will aid in documenting the feasibility and 
-	reasonableness of a given barrier design modelled in the FHWA
+	reasonableness of a given barrier design modeled in the FHWA
 	TNM 2.5. Information is pulled from an ".xlsx" wb of any name 
-	with the assumption	that the Barrier Design Table results and
+	with the assumption that the Barrier Design Table results and
 	Sound Level Results tables are copied AS-IS directly from TNM 2.5
 	to two separate worksheets in the ".xlsx" workbook.
 	
-	- **parameters**
 	:param wbname: ".xlsx" file on disk (i.g. "Barriers.xlsx")
 	:param barsheet: worksheet in ".xlsx" containing Barrier Design Table
 	:param sndsheet: "worksheet in ".xlsx" containing Sound Level Results
 	:param barriercost: cost of barrier design, as reported by TNM 2.5
 	"""
 
-	def __init__(self, wbname, barsheet, sndsheet, barcost=None):
+	def __init__(self, wbname, barsheet, sndsheet, barcost=0):
 		self._wbname = wbname
 		self._barsheet = barsheet
 		self._sndsheet = sndsheet
@@ -35,6 +34,31 @@ class Analysis(object):
 		self.barriercost = barcost
 		self._barrecs = self._wbhandler(barsheet)
 		self._sndrecs = self._wbhandler(sndsheet)
+		"""Receivers listed in the Sound Results worksheet"""
+		self.snd_rec_list = [
+                                  (i[0].value, i[2].value, i[8].value) 
+                                      for i in self._sndrecs
+                               ]
+		self.impacted_recs = [(i[0], i[1]) for i in self.recs_analysis 
+                                      if i[4] != " ----"
+                                ]
+		self.impact_num = sum([tup[1] for tup in self.impacted_recs])
+		self.du_analysis = sum([tup[1] for tup in self.recs_analysis])
+		self.benefitted =  [
+                                  (i[0], i[1]) for i in self.recs_analysis 
+                                      if i[2] >= 5
+                              ]
+		self.benefit_num = sum([tup[1] for tup in self.benefitted])
+		self.ben_and_imp = [
+                                  (i[0], i[1]) for i in self.recs_analysis 
+                                      if i[2] >= 5 and i[4] != " ----"
+                               ]
+		self.ben_and_imp_num = sum([tup[1] for tup in self.ben_and_imp])
+		self.reas_red_recs = [
+                                  (i[0], i[1]) for i in self.recs_analysis
+                                      if i[2] >= i[3]
+                                ]
+		self.reas_red_num = sum([tup[1] for tup in self.reas_red_recs])
 	def _wbhandler(self, sht):
 		"""
 		Load Excel workbook and generate appropriate receiver list
@@ -43,7 +67,7 @@ class Analysis(object):
 		wb = p.load_workbook(self._wbname)
 		ws = wb.get_sheet_by_name(sht)
 		if not ws:
-			raise ValueError("Excel worksheet not found! " + 
+			raise ValueError("Excel worksheet not found!" + 
                                        "Is it spelled correctly?")
 		if sht == self._barsheet:
 			lastrow = ws.get_highest_row()
@@ -55,21 +79,8 @@ class Analysis(object):
 			datarange = 'B20:N{}'.format(lastrow)
 		reclist = list(ws.iter_rows(range_string=datarange))
 		return reclist
-	@property
-	def snd_rec_list(self):
-		"""
-		Return list of receivers, DUs, and impact status
-		from TNM Sound Results table
-		
-		Depending on TNM model setup, this may not match the receivers
-		included in the barrier analysis.
-		"""
-		reclist = self._sndrecs
-		#pull recid, reduction, and design goal from table
-		result = [(i[0].value, i[2].value, i[8].value) for i in reclist]
-		return result
 	@property		
-	def recs_in_analysis(self):
+	def recs_analysis(self):
 		"""
 		List receivers, DU, barrier reduction value, reduction goal, and
 		impact status in chosen barrier analysis
@@ -88,80 +99,7 @@ class Analysis(object):
 					r.append((rec, du, barred, redgoal, impstat))
 				else:
 					pass
-		return r
-	@property
-	def du_in_analysis(self):
-		"""
-		Number of receptors in this analysis 
-		"""
-		dulist = [tup[1] for tup in self.recs_in_analysis]
-		return sum(dulist)
-	@property
-	def ben_and_imp(self):
-		"""
-		List of impacted receivers in this analysis 
-		that are benefitted (<= 5dBA)
-		"""
-		reclist = self.recs_in_analysis
-		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5
-                          and item[4] != " ----"]
-		return benefits
-	@property
-	def benefitted(self):
-		"""
-		List any receivers in this analysis that are benefitted (<= 5dBA)
-		"""
-		reclist = self.recs_in_analysis
-		benefits = [(item[0], item[1]) for item in reclist if item[2] >= 5]
-		return benefits
-	@property
-	def reas_red_recs(self):
-		"""
-		List receivers from this barrier analysis that are receiving
-		a reasonable noise reduction, as determined by the noise reduction
-		design goal
-		"""
-		reclist = self.recs_in_analysis
-		reasredlist = [(i[0], i[1]) for i in reclist if i[2] >= i[3]]
-		return reasredlist
-	@property
-	def impacted_recs(self):
-		"""
-		List impacted receivers that are part of this barrier analysis
-		"""
-		reclist = self.recs_in_analysis
-		result = [(i[0], i[1]) for i in reclist if i[4] != " ----"]
-		return result
-	@property
-	def impact_num(self):
-		"""
-		Return number of impacted receptors in barrier analysis
-		"""
-		dulist = [tup[1] for tup in self.impacted_recs]
-		return sum(dulist)
-	@property
-	def benefit_num(self):
-		"""
-		Return number of benefitted receptors in barrier analysis
-		"""
-		dulist = [tup[1] for tup in self.benefitted]
-		return sum(dulist)
-	@property
-	def ben_and_imp_num(self):
-		"""
-		Return number of benefitted and impacted receptors 
-		in barrier analysis
-		"""
-		dulist = [tup[1] for tup in self.ben_and_imp]
-		return sum(dulist)
-	@property
-	def reas_red_num(self):
-		"""
-		Return number of benefitted receptors in barrier analysis
-		that are receiving a reasonable noise reduction
-		"""
-		dulist = [tup[1] for tup in self.reas_red_recs]
-		return sum(dulist)
+		return sorted(r)
 	@property
 	def perc_imp_benefitted(self):
 		"""
@@ -205,26 +143,34 @@ class Analysis(object):
 			return True
 		else:
 			return False
-
+	def cost_per_benefit(self):
+		"""
+		If a barrier cost has been specified, returns the cost per 
+		benefitted receptor based on the policy-specific allowable cost
+		"""
+		if self.barriercost <= 0:
+		    return 0
+		else:
+		    return self.barriercost / self.benefit_num
 	def report(self):
 		"""
 		Report of results. Useful for report writing or debugging.
 		"""
 		print "Receivers/receptors in barrier analysis: {} ({})".format(\
-                              len(self.recs_in_analysis), self.du_in_analysis)
+                              len(self.recs_analysis), self.du_analysis)
 		print "Impacts in barrier analysis: {} ({})".format(\
                               len(self.impacted_recs), self.impact_num)
 		print "Benefits in barrier analysis: {} ({})".format(\
                               len(self.benefitted), self.benefit_num)
 		print "Number of impacts receiving 5dBA reduction: {}".format(\
                               self.ben_and_imp_num)
-		print "%  of impacts receiving 5dBA reduction: {}".format(\
+		print "Impacts (%) receiving 5dBA reduction: {}".format(\
                               self.perc_imp_benefitted)
-		print "Number of benefits receiving 8dBA reduction: {} ({})".format(\
+		print "Benefits receiving 8dBA reduction: {} ({})".format(\
                               len(self.reas_red_recs), self.reas_red_num) 
-		print "%  of benefits receiving reasonable reduction: {}".format(\
+		print "Benefits (%) receiving reasonable reduction: {}".format(\
                               self.perc_ben_reasonable) 
 		print "Barrier design is feasible: {}".format(\
                               self.feasible)
 		print "Barrier design is reasonable: {}".format(\
-                              self.reasonable)	  
+                              self.reasonable)

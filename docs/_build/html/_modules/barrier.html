@@ -40,13 +40,9 @@
   <h1>Source code for barrier</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on Sat Jul 11 11:14:37 2015</span>
-
 <span class="sd">Purpose: Quickly assess the feasibility and reasonableness </span>
 <span class="sd">of a given barrier design, given a reduction design goal,</span>
 <span class="sd">a reasonable cost, and any other state-specific criteria</span>
-
-<span class="sd">@author: Brandon</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">openpyxl</span> <span class="kn">as</span> <span class="nn">p</span>
@@ -57,20 +53,19 @@
 <span class="sd">	</span>
 <span class="sd">	This class will contain several read-only properties</span>
 <span class="sd">	that will aid in documenting the feasibility and </span>
-<span class="sd">	reasonableness of a given barrier design modelled in the FHWA</span>
+<span class="sd">	reasonableness of a given barrier design modeled in the FHWA</span>
 <span class="sd">	TNM 2.5. Information is pulled from an &quot;.xlsx&quot; wb of any name </span>
-<span class="sd">	with the assumption	that the Barrier Design Table results and</span>
+<span class="sd">	with the assumption that the Barrier Design Table results and</span>
 <span class="sd">	Sound Level Results tables are copied AS-IS directly from TNM 2.5</span>
 <span class="sd">	to two separate worksheets in the &quot;.xlsx&quot; workbook.</span>
 <span class="sd">	</span>
-<span class="sd">	- **parameters**</span>
 <span class="sd">	:param wbname: &quot;.xlsx&quot; file on disk (i.g. &quot;Barriers.xlsx&quot;)</span>
 <span class="sd">	:param barsheet: worksheet in &quot;.xlsx&quot; containing Barrier Design Table</span>
 <span class="sd">	:param sndsheet: &quot;worksheet in &quot;.xlsx&quot; containing Sound Level Results</span>
 <span class="sd">	:param barriercost: cost of barrier design, as reported by TNM 2.5</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 
-	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wbname</span><span class="p">,</span> <span class="n">barsheet</span><span class="p">,</span> <span class="n">sndsheet</span><span class="p">,</span> <span class="n">barcost</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wbname</span><span class="p">,</span> <span class="n">barsheet</span><span class="p">,</span> <span class="n">sndsheet</span><span class="p">,</span> <span class="n">barcost</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">_wbname</span> <span class="o">=</span> <span class="n">wbname</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">_barsheet</span> <span class="o">=</span> <span class="n">barsheet</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">_sndsheet</span> <span class="o">=</span> <span class="n">sndsheet</span>
@@ -79,6 +74,31 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">barriercost</span> <span class="o">=</span> <span class="n">barcost</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">_barrecs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wbhandler</span><span class="p">(</span><span class="n">barsheet</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">_sndrecs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wbhandler</span><span class="p">(</span><span class="n">sndsheet</span><span class="p">)</span>
+		<span class="sd">&quot;&quot;&quot;Receivers listed in the Sound Results worksheet&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">snd_rec_list</span> <span class="o">=</span> <span class="p">[</span>
+                                  <span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">i</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> 
+                                      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sndrecs</span>
+                               <span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">impacted_recs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_analysis</span> 
+                                      <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot; ----&quot;</span>
+                                <span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">impact_num</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impacted_recs</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">du_analysis</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_analysis</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">benefitted</span> <span class="o">=</span>  <span class="p">[</span>
+                                  <span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_analysis</span> 
+                                      <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span>
+                              <span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">benefit_num</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">benefitted</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ben_and_imp</span> <span class="o">=</span> <span class="p">[</span>
+                                  <span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_analysis</span> 
+                                      <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">i</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot; ----&quot;</span>
+                               <span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ben_and_imp_num</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ben_and_imp</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">reas_red_recs</span> <span class="o">=</span> <span class="p">[</span>
+                                  <span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_analysis</span>
+                                      <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">i</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                                <span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">reas_red_num</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reas_red_recs</span><span class="p">])</span>
 	<span class="k">def</span> <span class="nf">_wbhandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sht</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Load Excel workbook and generate appropriate receiver list</span>
@@ -99,21 +119,8 @@
 			<span class="n">datarange</span> <span class="o">=</span> <span class="s">&#39;B20:N{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lastrow</span><span class="p">)</span>
 		<span class="n">reclist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">iter_rows</span><span class="p">(</span><span class="n">range_string</span><span class="o">=</span><span class="n">datarange</span><span class="p">))</span>
 		<span class="k">return</span> <span class="n">reclist</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">snd_rec_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Return list of receivers, DUs, and impact status</span>
-<span class="sd">		from TNM Sound Results table</span>
-<span class="sd">		</span>
-<span class="sd">		Depending on TNM model setup, this may not match the receivers</span>
-<span class="sd">		included in the barrier analysis.</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">reclist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sndrecs</span>
-		<span class="c">#pull recid, reduction, and design goal from table</span>
-		<span class="n">result</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">i</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">reclist</span><span class="p">]</span>
-		<span class="k">return</span> <span class="n">result</span>
 	<span class="nd">@property</span>		
-	<span class="k">def</span> <span class="nf">recs_in_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">recs_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		List receivers, DU, barrier reduction value, reduction goal, and</span>
 <span class="sd">		impact status in chosen barrier analysis</span>
@@ -132,80 +139,7 @@
 					<span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rec</span><span class="p">,</span> <span class="n">du</span><span class="p">,</span> <span class="n">barred</span><span class="p">,</span> <span class="n">redgoal</span><span class="p">,</span> <span class="n">impstat</span><span class="p">))</span>
 				<span class="k">else</span><span class="p">:</span>
 					<span class="k">pass</span>
-		<span class="k">return</span> <span class="n">r</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">du_in_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Number of receptors in this analysis </span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">dulist</span> <span class="o">=</span> <span class="p">[</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_in_analysis</span><span class="p">]</span>
-		<span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dulist</span><span class="p">)</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">ben_and_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		List of impacted receivers in this analysis </span>
-<span class="sd">		that are benefitted (&lt;= 5dBA)</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">reclist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_in_analysis</span>
-		<span class="n">benefits</span> <span class="o">=</span> <span class="p">[(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">reclist</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span>
-                          <span class="ow">and</span> <span class="n">item</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot; ----&quot;</span><span class="p">]</span>
-		<span class="k">return</span> <span class="n">benefits</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">benefitted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		List any receivers in this analysis that are benefitted (&lt;= 5dBA)</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">reclist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_in_analysis</span>
-		<span class="n">benefits</span> <span class="o">=</span> <span class="p">[(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">reclist</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">]</span>
-		<span class="k">return</span> <span class="n">benefits</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">reas_red_recs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		List receivers from this barrier analysis that are receiving</span>
-<span class="sd">		a reasonable noise reduction, as determined by the noise reduction</span>
-<span class="sd">		design goal</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">reclist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_in_analysis</span>
-		<span class="n">reasredlist</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">reclist</span> <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">i</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
-		<span class="k">return</span> <span class="n">reasredlist</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">impacted_recs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		List impacted receivers that are part of this barrier analysis</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">reclist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recs_in_analysis</span>
-		<span class="n">result</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">reclist</span> <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot; ----&quot;</span><span class="p">]</span>
-		<span class="k">return</span> <span class="n">result</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">impact_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Return number of impacted receptors in barrier analysis</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">dulist</span> <span class="o">=</span> <span class="p">[</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impacted_recs</span><span class="p">]</span>
-		<span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dulist</span><span class="p">)</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">benefit_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Return number of benefitted receptors in barrier analysis</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">dulist</span> <span class="o">=</span> <span class="p">[</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">benefitted</span><span class="p">]</span>
-		<span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dulist</span><span class="p">)</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">ben_and_imp_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Return number of benefitted and impacted receptors </span>
-<span class="sd">		in barrier analysis</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">dulist</span> <span class="o">=</span> <span class="p">[</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ben_and_imp</span><span class="p">]</span>
-		<span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dulist</span><span class="p">)</span>
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">reas_red_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Return number of benefitted receptors in barrier analysis</span>
-<span class="sd">		that are receiving a reasonable noise reduction</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">dulist</span> <span class="o">=</span> <span class="p">[</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reas_red_recs</span><span class="p">]</span>
-		<span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dulist</span><span class="p">)</span>
+		<span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 	<span class="nd">@property</span>
 	<span class="k">def</span> <span class="nf">perc_imp_benefitted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -249,29 +183,37 @@
 			<span class="k">return</span> <span class="bp">True</span>
 		<span class="k">else</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">False</span>
-
+<div class="viewcode-block" id="Analysis.cost_per_benefit"><a class="viewcode-back" href="../index.html#barrier.Analysis.cost_per_benefit">[docs]</a>	<span class="k">def</span> <span class="nf">cost_per_benefit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		If a barrier cost has been specified, returns the cost per </span>
+<span class="sd">		benefitted receptor based on the policy-specific allowable cost</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">barriercost</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+		    <span class="k">return</span> <span class="mi">0</span>
+		<span class="k">else</span><span class="p">:</span>
+		    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">barriercost</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">benefit_num</span></div>
 <div class="viewcode-block" id="Analysis.report"><a class="viewcode-back" href="../index.html#barrier.Analysis.report">[docs]</a>	<span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Report of results. Useful for report writing or debugging.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">print</span> <span class="s">&quot;Receivers/receptors in barrier analysis: {} ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
-                              <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recs_in_analysis</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">du_in_analysis</span><span class="p">)</span>
+                              <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recs_analysis</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">du_analysis</span><span class="p">)</span>
 		<span class="k">print</span> <span class="s">&quot;Impacts in barrier analysis: {} ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
                               <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impacted_recs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">impact_num</span><span class="p">)</span>
 		<span class="k">print</span> <span class="s">&quot;Benefits in barrier analysis: {} ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
                               <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benefitted</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">benefit_num</span><span class="p">)</span>
 		<span class="k">print</span> <span class="s">&quot;Number of impacts receiving 5dBA reduction: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
                               <span class="bp">self</span><span class="o">.</span><span class="n">ben_and_imp_num</span><span class="p">)</span>
-		<span class="k">print</span> <span class="s">&quot;</span><span class="si">%  o</span><span class="s">f impacts receiving 5dBA reduction: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
+		<span class="k">print</span> <span class="s">&quot;Impacts (%) receiving 5dBA reduction: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
                               <span class="bp">self</span><span class="o">.</span><span class="n">perc_imp_benefitted</span><span class="p">)</span>
-		<span class="k">print</span> <span class="s">&quot;Number of benefits receiving 8dBA reduction: {} ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
+		<span class="k">print</span> <span class="s">&quot;Benefits receiving 8dBA reduction: {} ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
                               <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reas_red_recs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">reas_red_num</span><span class="p">)</span> 
-		<span class="k">print</span> <span class="s">&quot;</span><span class="si">%  o</span><span class="s">f benefits receiving reasonable reduction: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
+		<span class="k">print</span> <span class="s">&quot;Benefits (%) receiving reasonable reduction: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
                               <span class="bp">self</span><span class="o">.</span><span class="n">perc_ben_reasonable</span><span class="p">)</span> 
 		<span class="k">print</span> <span class="s">&quot;Barrier design is feasible: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
                               <span class="bp">self</span><span class="o">.</span><span class="n">feasible</span><span class="p">)</span>
 		<span class="k">print</span> <span class="s">&quot;Barrier design is reasonable: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>\
-                              <span class="bp">self</span><span class="o">.</span><span class="n">reasonable</span><span class="p">)</span>	  </div></div>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">reasonable</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>
