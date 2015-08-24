@@ -67,7 +67,7 @@ class Analysis(object):
 		wb = p.load_workbook(self._wbname)
 		ws = wb.get_sheet_by_name(sht)
 		if not ws:
-			raise ValueError("Excel worksheet not found! " + 
+			raise ValueError("Excel worksheet not found!" + 
                                        "Is it spelled correctly?")
 		if sht == self._barsheet:
 			lastrow = ws.get_highest_row()
