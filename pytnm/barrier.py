@@ -70,12 +70,12 @@ class Analysis(object):
 			raise ValueError("Excel worksheet not found!" + 
                                        "Is it spelled correctly?")
 		if sht == self._barsheet:
-			lastrow = ws.get_highest_row()
+			lastrow = ws.max_row
 			#assumes copied from TNM bar sound results in cell A1
 			datarange = 'B18:L{}'.format(lastrow)
 		elif sht == self._sndsheet:
 			#omit last 8 rows in snd results
-			lastrow = ws.get_highest_row() - 8
+			lastrow = ws.max_row - 8
 			datarange = 'B20:N{}'.format(lastrow)
 		reclist = list(ws.iter_rows(range_string=datarange))
 		return reclist
@@ -100,6 +100,13 @@ class Analysis(object):
 				else:
 					pass
 		return sorted(r)
+	@property
+	def benefits(self):
+		"""
+		Return tuple of benefited receiver/receptor counts
+		"""
+		return [(r[0], r[1]) for r in self.recs_analysis
+					if r[2] >= 5]
 	@property
 	def perc_imp_benefitted(self):
 		"""
