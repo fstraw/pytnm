@@ -7,7 +7,7 @@ Convert excel to list or tuple
 import shapefile
 import openpyxl
 
-wbname = '../files/tnm_inputs.xlsx'
+wbname = '../files/bar3.xlsx'
 
 # def tnm_feature_to_list(wbname, ws):
 #     """ Returns filtered list of specified feature. Requires spreadsheet with named worksheet"""
@@ -31,6 +31,17 @@ wbname = '../files/tnm_inputs.xlsx'
 #                 roads[-1][2].append([x, y, z])
 #     return roads
 
+def bar_point_id_xy_dict(wbname, ws='Barriers'):
+    wb = openpyxl.load_workbook(wbname)
+    wb = openpyxl.load_workbook(wbname)
+    barriers_ws = wb[ws]
+    bars = []
+    for row in barriers_ws.rows:
+        vals = [cell.value for cell in row]
+        bars.append(vals)
+    bars_no_header = bars[15:] #clip TNM2.5 header
+    return {row[11]: (row[13], row[14]) for row in bars_no_header}
+
 def rds_to_list(wbname, ws='Roads'):
     """
     Returns filtered list of roads
@@ -49,6 +60,9 @@ def rds_to_list(wbname, ws='Roads'):
     for rd in rds_no_header:
         rd_name, rd_width = rd[1], rd[2]
         x, y, z = rd[6], rd[7], rd[8]
+        #check for empty end rows
+        if None in (x, y, z):
+            break
         if rd_name:
             roads.append([rd_name, rd_width, [[x, y, z]]])
             found_road = True
@@ -76,6 +90,9 @@ def barriers_to_list(wbname, ws='Barriers'):
     for bar in bars_no_header:
         bar_name, bar_max_height, square_foot_cost = bar[1], bar[4], bar[5]
         x, y, z = bar[13], bar[14], bar[15]
+        #check for empty end rows
+        if None in (x, y, z):
+            break
         if bar_name:
             barriers.append([bar_name, bar_max_height, square_foot_cost, [[x, y, z]]])
             found_bar = True
@@ -84,6 +101,9 @@ def barriers_to_list(wbname, ws='Barriers'):
             if not found_bar:
                 barriers[-1][3].append([x, y, z])
     return barriers
+
+def group_barrier_segments_by_height(wbname, ws='Barrier_Segments'):
+    pass
 
 def rds_list_to_shape(rdslist, outputshp, traf_dict=None):
     w = shapefile.Writer(shapefile.POLYLINEZ)
@@ -98,7 +118,7 @@ def rds_list_to_shape(rdslist, outputshp, traf_dict=None):
     for rd in rdslist:
         w.line(parts=[rd[2]], shapeType=13)
         if not traf_dict:
-            w.record(rd[0], rd[1], 0, 0, 0, 0, 0, 0)
+            w.record(rd[0], int(rd[1]), 0, 0, 0, 0, 0, 0)
         else:
             auto = traffic_dict[rd[0]][0]
             medium = traffic_dict[rd[0]][1]
@@ -106,7 +126,7 @@ def rds_list_to_shape(rdslist, outputshp, traf_dict=None):
             medpct = traffic_dict[rd[0]][3]
             hvypct = traffic_dict[rd[0]][4]
             speed = traffic_dict[rd[0]][5]
-            w.record(rd[0], rd[1], auto, medium, heavy, medpct, hvypct, speed)
+            w.record(rd[0], int(rd[1]), auto, medium, heavy, medpct, hvypct, speed)
     w.save(outputshp)
     return outputshp
 
@@ -117,7 +137,7 @@ def bars_list_to_shape(barslist, outputshp):
     w.field('CostPerSF', 'N')
     for bar in barslist:
         w.line(parts=[bar[3]], shapeType=13)
-        w.record(bar[0], bar[1], bar[2])
+        w.record(bar[0], int(bar[1]), bar[2])
     w.save(outputshp)
     return outputshp
 
@@ -152,5 +172,4 @@ if __name__ == '__main__':
     traffic_dict = append_tnm_traffic(wbname, ws='Traffic')
     rdslist = rds_to_list(wbname, ws='Roads')
     rds_list_to_shape(rdslist, rdshp, traffic_dict)
-    for rd in traffic_dict:
-        print rd
+    print bar_point_id_xy_dict(wbname)
