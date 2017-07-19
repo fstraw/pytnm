@@ -1,6 +1,7 @@
 import barrier
+from arcpy import da
 
-xlsx = r'C:\TNM25\KHA_1605\Comparison.xlsx'
+xlsx = r'U:\Shared\JOBS\KHA\KHA1401 GA 400 CD Lanes\Noise\TNM\2016\Comparison.xlsx'
 
 def benefit_cost(num_receptors, wall_cost):
     result = float(num_receptors) * (55000.0 / float(wall_cost))
@@ -16,72 +17,57 @@ old_cost = {1:1838530,
             8:2525999,            
             }
 
+def parcel_addresses(fc):
+    """ Pull addresses from feature class """
+    sql = """ EP_REC_NO > 0 """
+    result =  [r for r in da.SearchCursor(fc, ('EP_REC_NO', 
+                                               'Owner', 'Address', 'ZipCode'), sql)]
+    return result            
 
-for bar in barriers:
-    old_bar = 'Barrier{}_Old'.format(bar)
-    old_snd = 'Barrier{}_Old_Snd'.format(bar)
-    new_bar = 'Barrier{}_New'.format(bar)
-    new_snd = 'Barrier{}_New_Snd'.format(bar)
-    old = barrier.Analysis(xlsx, old_bar, old_snd)
-    new = barrier.Analysis(xlsx, new_bar, new_snd)
-    print 'Barrier {}'.format(bar), benefit_cost(old.ben_and_imp_num, old_cost[bar]), new.benefit_num
+def previous_imp(old, new):    
+    old_impacted_benefits = [oi[0] for oi in old.ben_and_imp]
+    new_impacted_benefits = [ni[0] for ni in new.ben_and_imp]
+    old_impacts = [oi[0] for oi in old.impacted_recs]    
+    new_impacts = [ni[0] for ni in new.impacted_recs]
+    for old_impacted_benefit in old_impacted_benefits:
+        if old_impacted_benefit in new_impacted_benefits:
+            pass #old impacted benefit is currently benefitted
+        else:
+            if not old_impacted_benefit in new_impacts:
+                pass #old impacted benefit is no longer impacted
+            else:
+                print old_impacted_benefit
+        
+def benefits_to_barrier():
+    """ Map benefits to barrier """
+    benefit_list = []
+    for bar in barriers:
+        new_bar = 'Barrier{}_New'.format(bar)
+        new_snd = 'May2016_Bld_Results'
+        new = barrier.Analysis(xlsx, new_bar, new_snd)
+        for benefit in new.benefits:
+            benefit_list += [(b[0], bar) for b in new.benefits]
+    result = dict(benefit_list)
+    return result
 
-#bar1_old = barrier.Analysis(xlsx, 'Barrier1_Old', 'Barrier1_Old_Snd')
-#bar1_new = barrier.Analysis(xlsx, 'Barrier1_New', 'Barrier1_New_Snd')
-#
-#bar3_old = barrier.Analysis(xlsx, 'Barrier3_Old', 'Barrier3_Old_Snd')
-#bar3_new = barrier.Analysis(xlsx, 'Barrier3_New', 'Barrier3_New_Snd')
-#
-#bar4_old = barrier.Analysis(xlsx, 'Barrier4_Old', 'Barrier4_Old_Snd')
-#bar4_new = barrier.Analysis(xlsx, 'Barrier4_New', 'Barrier4_New_Snd')
-#
-#bar5_old = barrier.Analysis(xlsx, 'Barrier5_Old', 'Barrier5_Old_Snd')
-#bar5_new = barrier.Analysis(xlsx, 'Barrier5_New', 'Barrier5_New_Snd')
-#
-#bar6_old = barrier.Analysis(xlsx, 'Barrier6_Old', 'Barrier6_Old_Snd')
-#bar6_new = barrier.Analysis(xlsx, 'Barrier6_New', 'Barrier6_New_Snd')
-#
-#bar7_old = barrier.Analysis(xlsx, 'Barrier7_Old', 'Barrier7_Old_Snd')
-#bar7_new = barrier.Analysis(xlsx, 'Barrier7_New', 'Barrier7_New_Snd')
-#
-#bar8_old = barrier.Analysis(xlsx, 'Barrier8_Old', 'Barrier8_Old_Snd')
-#bar8_new = barrier.Analysis(xlsx, 'Barrier8_New', 'Barrier8_New_Snd')
+def benefits_to_file():
+    f = open('benefits.csv', 'wb')
+    f.write('Receiver, Barrier\n')
+    for bar in barriers:
+        old_bar = 'Barrier{}_Old'.format(bar)
+        old_snd = 'Dec2014_Bld_Results'
+        new_bar = 'Barrier{}_New'.format(bar)
+        new_snd = 'May2016_Bld_Results'
+        old = barrier.Analysis(xlsx, old_bar, old_snd)
+        new = barrier.Analysis(xlsx, new_bar, new_snd)
+        new_impacts = new.impact_num
+        new_benefits = new.ben_and_imp_num
+        print 'Barrier {}'.format(bar), old.impact_num, old.ben_and_imp_num,  '|', new.impact_num, new.ben_and_imp_num
+        previous_imp(old, new)
+        print 'Barrier {}'.format(bar), benefit_cost(old.ben_and_imp_num, old_cost[bar]), new.ben_and_imp_num
+        for benefit in new.benefits:
+            f.write('{}, Barrier{}\n'.format(benefit[0], bar))
+    f.close()
 
-
-#l = bar1_new.recs_analysis
-#old_benefits = bar1_old.benefits
-#new_benefits = bar1_new.benefits
-#
-#l = bar3_new.recs_analysis
-#old_benefits = bar3_old.benefits
-#new_benefits = bar3_new.benefits
-#
-#l = bar4_new.recs_analysis
-#old_benefits = bar4_old.benefits
-#new_benefits = bar4_new.benefits
-#
-#l = bar5_new.recs_analysis
-#old_benefits = bar5_old.benefits
-#new_benefits = bar5_new.benefits
-#
-#l = bar6_new.recs_analysis
-#old_benefits = bar6_old.benefits
-#new_benefits = bar6_new.benefits
-
-#l = bar7_new.recs_analysis
-#old_benefits = bar7_old.benefits
-#new_benefits = bar7_new.benefits
-#
-#l = bar8_new.recs_analysis
-#old_benefits = bar8_old.benefits
-#new_benefits = bar8_new.benefits
-
-
-#for rec in old_benefits:
-#    if rec in new_benefits:
-#        pass
-#    else:
-#        print rec
-#        
-#print len(old_benefits)
-#print len(new_benefits)
+if __name__ == '__main__':
+    pass

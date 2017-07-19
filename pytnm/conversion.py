@@ -8,7 +8,7 @@ Created on Thu Apr 14 13:31:11 2016
 import openpyxl
 import shapefile
 
-xlsx = r'C:\Users\bbatt\Dropbox\!Python\pytnm\pytnm\Build_Geom_Test.xlsx'
+xlsx = r'C:\Users\brbat\Dropbox\!Python\pytnm\pytnm\Build_Geom_Test.xlsx'
 
 def _xlsx_to_traffic(xlsx):
     """ Converts .xlsx spreadsheet of TNM Traffic to dictionary """
@@ -44,7 +44,7 @@ def xlsx_to_list(xlsx):
                 fc_list.append((rd_val, x, y, z))
     return fc_list
 
-def tnm_rds_to_fc(fc_list):
+def tnm_rds_to_fc(fc_list, output):
     t = _xlsx_to_traffic(xlsx)
     w = shapefile.Writer(shapeType=13)    
     w.field('RdName', 'C', 32)
@@ -59,11 +59,9 @@ def tnm_rds_to_fc(fc_list):
                 pnt_list.append([float(item[1]), float(item[2]), float(item[3])])
         w.line(parts=[pnt_list], shapeType=13)
         w.record(rd, t[rd][0],  t[rd][1],  t[rd][2]) ##filler        
-    w.save('test')
+    w.save(output)
 
 if __name__ == '__main__':
     x = _xlsx_to_traffic(xlsx)   
     t = xlsx_to_list(xlsx)
-    l = tnm_rds_to_fc(t)
-#    for i in t:
-#        print i
+    l = tnm_rds_to_fc(t, r'C:\Users\bbatt\Dropbox\!Python\pytnm\tests\test_files\test_shp')

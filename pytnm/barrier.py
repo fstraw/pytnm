@@ -181,3 +181,32 @@ class Analysis(object):
                               self.feasible)
 		print "Barrier design is reasonable: {}".format(\
                               self.reasonable)
+
+class GAAnalysis(Analysis):
+    def __init__(self, wbname, barsheet, sndsheet, barcost=0):
+        super(GAAnalysis, self).__init__(wbname, barsheet, sndsheet, barcost=0)
+	@property
+	def feasible(self):
+		"""
+        Barrier design is feasible if one or more of impacted receivers
+        receive a 5dBA or more noise reduction
+        """
+        if self.ben_and_imp_num >= 1:
+            return True
+        return False
+
+	@property
+	def reasonable(self):
+		"""
+        Barrier design is reasonable if 80% or more of benefitted receivers
+        receive a 8dBA or more noise reduction
+        """
+		perc_crit = self.benefit_num * 0.80
+		if perc_crit == 0:
+			return False
+		elif self.reas_red_num >= perc_crit:
+			return True
+		else:
+			return False
+
+gaanalysis = GAAnalysis(r'C:\Users\bbatt\Dropbox\!Python\pytnm\tests\test_files\test.xlsx', 'Sheet2', 'Bars1_2_3_Snd')
