@@ -7,8 +7,6 @@ Convert excel to list or tuple
 import shapefile
 import openpyxl
 
-wbname = '../files/bar3.xlsx'
-
 # def tnm_feature_to_list(wbname, ws):
 #     """ Returns filtered list of specified feature. Requires spreadsheet with named worksheet"""
 #     wb = openpyxl.load_workbook(wbname)
@@ -33,14 +31,37 @@ wbname = '../files/bar3.xlsx'
 
 def bar_point_id_xy_dict(wbname, ws='Barriers'):
     wb = openpyxl.load_workbook(wbname)
-    wb = openpyxl.load_workbook(wbname)
     barriers_ws = wb[ws]
     bars = []
     for row in barriers_ws.rows:
         vals = [cell.value for cell in row]
         bars.append(vals)
     bars_no_header = bars[15:] #clip TNM2.5 header
-    return {row[11]: (row[13], row[14]) for row in bars_no_header}
+    return {row[11]: (row[13], row[14], row[15]) for row in bars_no_header}
+
+def get_last_barrier_seg_pointid(wbname, ws='Barriers'):
+    """
+    Returns last point for each barrier - temporary hack
+    :param wbname:
+    :param ws:
+    :return:
+    """
+    wb = openpyxl.load_workbook(wbname)
+    barriers_ws = wb[ws]
+    bars = []
+    lastpointdict = {}
+    for row in barriers_ws.rows:
+        vals = [cell.value for cell in row]
+        bars.append(vals)
+    bars_no_header = bars[15:] #clip TNM2.5 header
+    for row in bars_no_header:
+        barname = row[1]
+        lastindicator = row[17]
+        if barname:
+            currentbar = barname
+        if lastindicator == None:
+            lastpointdict[currentbar] = row[11]
+    return lastpointdict
 
 def rds_to_list(wbname, ws='Roads'):
     """
@@ -103,7 +124,55 @@ def barriers_to_list(wbname, ws='Barriers'):
     return barriers
 
 def group_barrier_segments_by_height(wbname, ws='Barrier_Segments'):
-    pass
+    """
+    Parses barrier into individual segment lengths, based on Barrier Segments output (TNM)
+    :param wbname:
+    :param ws:
+    :return:
+    """
+    wb = openpyxl.load_workbook(wbname)
+    barriers_ws = wb[ws]
+    bars = []
+    for row in barriers_ws.rows:
+        vals = [cell.value for cell in row]
+        bars.append(vals)
+    bars_no_header = bars[15:] #clip TNM2.5 header
+    barriers = []
+    #coupled - consider revisiting approach
+    XYZ_DICT = bar_point_id_xy_dict(wbname)
+    LAST_POINTS_DICT = get_last_barrier_seg_pointid(wbname) #consider revising approach
+    i = 0
+    while i < len(bars_no_header): #avoid index error
+        bar_name, bar_height = bars_no_header[i][1], bars_no_header[i][7]
+        try:
+            pointid1 = bars_no_header[i][4]
+            x1, y1, z1 = XYZ_DICT[pointid1]  # should return tuple
+            pointid2 = bars_no_header[i+1][4]
+            x2, y2, z2 = XYZ_DICT[pointid2]
+        except IndexError: #account for end of list
+            pointid2 = LAST_POINTS_DICT[current_bar] #should be assigned by the time this error throws
+            x2, y2, z2 = XYZ_DICT[pointid2]
+            break
+        except KeyError: #check for empty row
+            bar_height = bars_no_header[i-1][7]
+            pointid1 = bars_no_header[i-1][4]
+            x1, y1, z1 = XYZ_DICT[pointid1]  # should return tuple
+            pointid2 = LAST_POINTS_DICT[current_bar]  # should be assigned by the time this error throws
+            x2, y2, z2 = XYZ_DICT[pointid2]
+        if not pointid1:
+            bar_height = bars_no_header[i-1][7]
+            pointid1 = bars_no_header[i-1][4]
+            pointid2 = LAST_POINTS_DICT[current_bar]
+            x1, y1, z1 = XYZ_DICT[pointid1]
+            x2, y2, z2 = XYZ_DICT[pointid2]
+        if bar_name:
+            current_bar = bar_name
+        if bar_height == 0:
+            i+=1
+            continue
+        barriers.append([current_bar, pointid1, bar_height, [[x1, y1, z1], [x2, y2, z2]]])
+        i+=1
+    return barriers
 
 def rds_list_to_shape(rdslist, outputshp, traf_dict=None):
     w = shapefile.Writer(shapefile.POLYLINEZ)
@@ -141,6 +210,17 @@ def bars_list_to_shape(barslist, outputshp):
     w.save(outputshp)
     return outputshp
 
+def bar_segs_list_to_shape(barslist, outputshp):
+    w = shapefile.Writer(shapefile.POLYLINEZ)
+    w.field('Bar_Name', 'C', size=32)
+    w.field('PointID', 'C', size=10)
+    w.field('AVGHEIGHT', 'N')
+    for bar in barslist:
+        w.line(parts=[bar[3]], shapeType=13)
+        w.record(bar[0], bar[1], int(bar[2]))
+    w.save(outputshp)
+    return outputshp
+
 def append_tnm_traffic(wbname, ws='Traffic'):
     wb = openpyxl.load_workbook(wbname)
     traffic_ws = wb[ws]
@@ -164,12 +244,17 @@ def append_tnm_traffic(wbname, ws='Traffic'):
 
 
 if __name__ == '__main__':
+    wbname = '../files/exbars.xlsx'
     rdshp = r'../files/roads'
     barshp = r'../files/barriers'
+    barsegshp = r'../files/exbars'
 
     barslist = barriers_to_list(wbname, ws='Barriers')
     bars_list_to_shape(barslist, barshp)
     traffic_dict = append_tnm_traffic(wbname, ws='Traffic')
     rdslist = rds_to_list(wbname, ws='Roads')
     rds_list_to_shape(rdslist, rdshp, traffic_dict)
-    print bar_point_id_xy_dict(wbname)
+    # print bar_point_id_xy_dict(wbname)
+    barsegs = group_barrier_segments_by_height(wbname)
+    bar_segs_list_to_shape(barsegs, barsegshp)
+    t = get_last_barrier_seg_pointid(wbname)
