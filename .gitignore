@@ -43,3 +43,7 @@ scbar.py
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# gis
+**/*.gdb
+

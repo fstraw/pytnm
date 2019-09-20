@@ -4,7 +4,7 @@ from arcpy import AddField_management as af
 from arcpy import env
 
 env.overwriteOutput = True
-input_folder = "."
+input_folder = r"C:\Users\brbatt\PyCharmProjects\pytnm\gis\DATA"
 
 def create_receivers(input_folder):
     receivers = cf(out_path=input_folder,
@@ -496,7 +496,7 @@ def create_study_area(input_folder):
 
 def create_study_receivers(input_folder):
     receivers = cf(out_path=input_folder,
-        out_name="receiver",
+        out_name="study_receiver",
         geometry_type="POINT",
         template=None,
         has_m="ENABLED",
@@ -550,7 +550,7 @@ def create_study_receivers(input_folder):
 
 def create_field_measurements(input_folder):
     receivers = cf(out_path=input_folder,
-        out_name="receiver",
+        out_name="field_measurement",
         geometry_type="POINT",
         template=None,
         has_m="ENABLED",
