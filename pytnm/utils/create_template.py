@@ -3,7 +3,7 @@ from arcpy import CreateFeatureclass_management as cf
 from arcpy import AddField_management as af
 from arcpy import env
 
-env.overwriteOutput = True
+# env.overwriteOutput = True
 input_folder = r"C:\Users\brbatt\PyCharmProjects\pytnm\gis\DATA"
 
 def create_receivers(input_folder):

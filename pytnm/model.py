@@ -52,34 +52,6 @@ def get_count_of_unique_vals(fc, fields):
                 countList.append(row[0])
     return countList                
 
-#def process_roads(countList, fc):
-#    for uniqueroad in countList:
-#        expression = """{0} = '{1}'""".format(arcpy.AddFieldDelimiters(fc, "Rd_Name"), uniqueroad)
-#        print expression
-#        with arcpy.da.SearchCursor(fc,fields,expression) as cursor:
-#            i = 0
-#            rd_assessed = False
-#            for row in cursor:                
-#                if row[0] in countList and rd_assessed == False:
-#                    rd_assessed = True
-#                    #countList.remove(row[0])
-#                    f.write(row[0] + "\n")
-#                    f.write('CARS'+ " " + str(round(row[2],0)) + " " + str(row[1]) + "\n")
-#                    f.write('MT'+ " " + str(round(row[3],0)) + " " + str(row[1]) + "\n")
-#                    f.write('HT'+ " " + str(round(row[4],0)) + " " + str(row[1]) + "\n")
-#                    f.write("'L' /\n")
-#                f.write("'Point" + str(i) + "' " + str(round(row[5],1)) + " " + str(round(row[6],1)) + " " + str(round(row[7],1)) + " " + "0\n")
-#                i+=1
-#            f.write("'L' /\n")
-#
-#def write_roadways(f,fc):
-#    write_header(f)
-#    featlist = get_count_of_unique_vals(fc, fields)
-#    f.write("2," + str(len(featlist)) + "\n")
-#    process_roads(featlist, roadpntfile)
-#    f.write("7/\n")
-#    f.close()
-
 def improvedpoint(x, y, fcsr, rastersr):
     #Assumes data source is in meters (USDA NAIP)
     point = arcpy.Point(x,y)    
@@ -91,6 +63,11 @@ def improvedpoint(x, y, fcsr, rastersr):
     else:
         result = 0
     return result
+
+"""
+write_pnts(file, string)
+
+"""
 
 def improvedwritepnts(geom, fcsr, rastersr, ftype="Road"):
     i = 0
@@ -106,11 +83,10 @@ def improvedwritepnts(geom, fcsr, rastersr, ftype="Road"):
     for part in geom:
         for pnt in part:
             if ftype.upper() == "ROAD":
-#                x, y, z = round(pnt.X,1), round(pnt.Y,1), improvedpoint(pnt.X,pnt.Y,fcsr,rastersr)
-                x, y, z = round(pnt.X,1), round(pnt.Y,1), round(pnt.Z,1)
+                x, y, z = round(pnt.X, 1), round(pnt.Y, 1), round(pnt.Z, 1)
                 strPnt = "'Point{}' {} {} {} 0\n".format(i, x, y, z)
             elif ftype.upper() == "BARRIER":
-                x, y, z = round(pnt.X,1), round(pnt.Y,1), round(pnt.Z,1)
+                x, y, z = round(pnt.X,1), round(pnt.Y, 1), round(pnt.Z, 1)
                 if barincscount == 1:
                     strPnt = "'Point{}' {} {} {} {} {} {}\n".format(i, x, y, z + barinitheight, z, barpert, barinc)
                     barincscount -= 1
@@ -187,9 +163,6 @@ def improvedbarrier(fc, rast):
             improvedwritepnts(geometry, fcsr, rastersr, "BARRIER")
             arcpy.SetProgressorPosition()
         arcpy.ResetProgressor()
-#        improvedrecpnts(receiverfile, fcsr, rastersr)
-#        f.write("7/\n")
-#        f.close()
         
 def improvedroadway(fc, rast):
     fcdesc, rastdesc = arcpy.Describe(fc), arcpy.Describe(rast)
@@ -243,11 +216,9 @@ def calculateroadwayz(fc, rast):
             for part in row[0]:
                 for pnt in part:                
                     print(pnt.X, pnt.Y, pnt.Z)
-#calculateroadwayz(buildroadz,rast)
-#improvedroadway(buildroad, rast, bldflds)
+
 if __name__ == '__main__':
     validatespatialreference(road)
     validatespatialreference(receiverfile)
     validatespatialreference(rast)
     improvedroadway(road, rast)
-#print validatefields(receiverfile)

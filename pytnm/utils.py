@@ -150,7 +150,7 @@ def group_barrier_segments_by_height(wbname, ws='Barrier_Segments'):
             pointid2 = bars_no_header[i+1][4]
             x2, y2, z2 = XYZ_DICT[pointid2]
         except IndexError: #account for end of list
-            pointid2 = LAST_POINTS_DICT[current_bar] #should be assigned by the time this error throws
+            pointid2 = LAST_POINTS_DICT[current_bar] # should be assigned by the time this error throws
             x2, y2, z2 = XYZ_DICT[pointid2]
             break
         except KeyError: #check for empty row
