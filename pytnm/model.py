@@ -53,7 +53,7 @@ def get_count_of_unique_vals(fc, fields):
     return countList                
 
 def improvedpoint(x, y, fcsr, rastersr):
-    #Assumes data source is in meters (USDA NAIP)
+    #Assumes data source is in meters (USDA NAIP)git ciom
     point = arcpy.Point(x,y)    
     pnttrans = arcpy.PointGeometry(point,fcsr).projectAs(rastersr).firstPoint
     cellvalue = arcpy.GetCellValue_management(rast, "{} {}".format(
@@ -216,6 +216,24 @@ def calculateroadwayz(fc, rast):
             for part in row[0]:
                 for pnt in part:                
                     print(pnt.X, pnt.Y, pnt.Z)
+
+def add_z_to_points(fc, rast, zfactor):
+    """ Add Z value to Z-enabled point feature class"""
+    desc = arcpy.Describe(fc)
+    fcspatref = desc.spatialReference
+    if not desc.hasZ:
+        raise ValueError('Input feature class must be Z-enabled!')
+    if fcspatref == "Unknown":
+        raise ValueError("Projection of {} is undefined! Define projection and try again.".format(desc.name))
+    with arcpy.da.UpdateCursor(fc, ('SHAPE@X', 'SHAPE@Y', 'SHAPE@Z')) as ucursor:
+        for row in ucursor:
+            x = row[0]
+            y = row[1]
+            z = improvedpoint(x, y, fcspatref, rast, zfactor)
+            newpnt = arcpy.Point(x, y, z)
+            newpntGeom = arcpy.PointGeometry(newpnt)
+            row[2] = z
+            ucursor.updateRow(row)
 
 if __name__ == '__main__':
     validatespatialreference(road)
