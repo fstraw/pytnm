@@ -3,7 +3,7 @@
 Convert excel to list or tuple
 
 """
-
+import os
 import shapefile
 import openpyxl
 
@@ -244,7 +244,8 @@ def append_tnm_traffic(wbname, ws='Traffic'):
 
 
 if __name__ == '__main__':
-    wbname = '../files/exbars.xlsx'
+    os.chdir(os.path.dirname(__file__))    
+    wbname = '../files/00013914.xlsx'
     rdshp = r'../files/roads'
     barshp = r'../files/barriers'
     barsegshp = r'../files/exbars'
