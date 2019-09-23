@@ -181,8 +181,8 @@ def rds_list_to_shape(rdslist, outputshp, traf_dict=None):
     w.field('Auto', 'N')
     w.field('Medium', 'N')
     w.field('Heavy', 'N')
-    w.field('MedPct', 'I')
-    w.field('HvyPct', 'I')
+    w.field('MedPct', 'N')
+    w.field('HvyPct', 'N')
     w.field('Speed', 'C')
     for rd in rdslist:
         w.line(parts=[rd[2]], shapeType=13)
@@ -239,7 +239,7 @@ def append_tnm_traffic(wbname, ws='Traffic'):
                 medpct = round(float(medium) / (auto + medium + heavy) * 100, 1)
             if heavy:
                 hvypct = round(float(heavy) / (auto + medium + heavy) * 100, 1)
-            traffic_vols.append([rd_name, auto, medium, heavy, medpct, hvypct, speed])
+            traffic_vols.append([rd_name, auto, medium, heavy, medpct, hvypct, speed])            
     return {t[0]: (t[1], t[2], t[3], t[4], t[5], t[6]) for t in traffic_vols}
 
 
