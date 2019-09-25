@@ -10,6 +10,14 @@ import sys
 import openpyxl as p
 
 
+def _xlsx_to_traffic(ws):
+    """ Converts .xlsx spreadsheet of TNM Traffic to dictionary """
+    filter_rows = 7 ##omit these rows at start of spreadsheet    
+    traf_ws = ws
+    traf_dict = dict([(r[1].value.strip(), (r[5].value, r[7].value, r[9].value))
+                    for r in traf_ws.rows if r[1].value][filter_rows:])
+    return traf_dict
+
 def rds_to_list(ws):
     """
     Returns filtered list of roads    
@@ -48,11 +56,45 @@ def _read_roadways(xlsx):
 	try:
 		roadways_worksheet = [ws for ws in workbook.worksheets if ws['B5'].value == 'INPUT: ROADWAYS'][0]
 	except IndexError:
-		print('Roadways worksheet not found') # assume roadways does not exist
+		print('Roadways worksheet not found')
 	return(rds_to_list(roadways_worksheet))
 
+def _read_traffic(xlsx):
+	workbook = p.load_workbook(xlsx)
+	try:
+		traffic_worksheet = [ws for ws in workbook.worksheets if ws['B5'].value == 'INPUT: TRAFFIC FOR LAeq1h Volumes'][0]
+	except IndexError:
+		print('Traffic worksheet not found')
+	return(_xlsx_to_traffic(traffic_worksheet))
+
+class Traffic(object):
+	def __init__(self, auto, medium, heavy, bus=None, motorcycle=None):
+		self.auto = auto
+		self.medium = medium
+		self.heavy = heavy
+		self.bus = bus
+		self.motorcycle = motorcycle
+	def __repr__(self):
+		return self.auto
+
 class Roadway(object):
-	pass
+	"""Represents Roadway TNM object
+	
+	Arguments:
+		object {[type]} -- [description]
+	
+	Returns:
+		[type] -- [description]
+	"""
+	def __init__(self, name, width, points, traffic=None):
+		self.name = name
+		self.width = width
+		self.points = points
+		self.traffic = traffic
+		self.geometry = None
+	def __repr__(self):
+		return self.name
+
 
 class Receiver(object):
 	pass
@@ -65,7 +107,6 @@ class TerrainLine(object):
 
 class BuildingRow(object):
 	pass
-
 
 class Model(object):
 	"""[summary]
@@ -92,8 +133,20 @@ class Model(object):
 		object {[type]} -- [description]
 	"""
 
-	def __init__(self, worksheet_template):
-		pass
+	def __init__(self, xlsx):
+		self.TRAFFIC = _read_traffic(xlsx)
+		self._roads = _read_roadways(xlsx)
+	@property	
+	def roadways(self):
+		roads = []
+		for road in self._roads:
+			roads.append(Roadway(name=road[0], width=road[1], points=road[2], 
+				traffic=Traffic(auto=self.TRAFFIC[road[0]][0],
+						medium=self.TRAFFIC[road[0]][1],
+						heavy=self.TRAFFIC[road[0]][2])))
+		return roads
+
+		
 
 class Analysis(object):
 	"""Barrier analysis class
@@ -300,4 +353,10 @@ class Analysis(object):
 if __name__ == '__main__':
 	os.chdir(os.path.dirname(__file__))
 	model_xlsx = '../files/tnm_model.xlsx'
-	print(_read_roadways(model_xlsx))
+	build_model = Model(model_xlsx)
+	roadways = build_model.roadways	
+	for roadway in roadways:
+		print(roadway.traffic.auto)
+
+	
+	
