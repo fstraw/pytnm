@@ -5,8 +5,95 @@ of a given barrier design, given a reduction design goal,
 a reasonable cost, and any other state-specific criteria
 """
 
+import os
+import sys
 import openpyxl as p
 
+
+def rds_to_list(ws):
+    """
+    Returns filtered list of roads    
+    :param ws: 
+    :return: road_list
+    """    
+    roads_ws = ws
+    rds = []
+    for row in roads_ws.rows:
+        vals = [cell.value for cell in row]
+        rds.append(vals)
+    rds_no_header = rds[15:] #clip TNM2.5 header
+    roads = []
+    for rd in rds_no_header:
+        rd_name = rd[1]
+        rd_width = rd[2]
+        pnt = rd[4].strip()
+        x, y, z = rd[6], rd[7], rd[8]
+        #check for empty end rows
+        if None in (x, y, z):
+            break
+        if rd_name:
+            roads.append([rd_name.strip(), rd_width, [[pnt,[x, y, z]]]])
+            found_road = True
+        else:
+            found_road = False
+            if not found_road:
+                roads[-1][2].append([pnt,[x, y, z]])
+    return roads
+
+def _validate_xlsx(xlsx):
+	pass
+
+def _read_roadways(xlsx):
+	workbook = p.load_workbook(xlsx)
+	try:
+		roadways_worksheet = [ws for ws in workbook.worksheets if ws['B5'].value == 'INPUT: ROADWAYS'][0]
+	except IndexError:
+		print('Roadways worksheet not found') # assume roadways does not exist
+	return(rds_to_list(roadways_worksheet))
+
+class Roadway(object):
+	pass
+
+class Receiver(object):
+	pass
+
+class Barrier(object):
+	pass
+
+class TerrainLine(object):
+	pass
+
+class BuildingRow(object):
+	pass
+
+
+class Model(object):
+	"""[summary]
+	
+	>> build_run = pytnm.Model(string(.xlsx))
+	>> print(build_run.info)
+	>> '(('Build Run', 'Project', 'Company', 'Analyst', 'Date'))
+	>> roadways = build_run.roadways
+	>> roadway = roadways[0]
+	>> print(roadway.name)
+	>> 'I-10 On Ramp 1'
+	>> print(roadway.width)
+	>> 22
+	>> print(roadway.geometry)
+	>> ((123456, 4355422, 12), (123456, 4355422, 15), (123456, 4355422, 12))
+	>> print(roadway.traffic)
+	>> (125, 10, 5, 3, 1)
+	>> print(roadway.traffic.autos)
+	>> 125
+	>> print(roadway.traffic.autos.speed)
+	>> 45
+
+	Arguments:
+		object {[type]} -- [description]
+	"""
+
+	def __init__(self, worksheet_template):
+		pass
 
 class Analysis(object):
 	"""Barrier analysis class
@@ -163,50 +250,54 @@ class Analysis(object):
 		"""
 		Report of results. Useful for report writing or debugging.
 		"""
-		print "Receivers/receptors in barrier analysis: {} ({})".format(\
-                              len(self.recs_analysis), self.du_analysis)
-		print "Impacts in barrier analysis: {} ({})".format(\
-                              len(self.impacted_recs), self.impact_num)
-		print "Benefits in barrier analysis: {} ({})".format(\
-                              len(self.benefitted), self.benefit_num)
-		print "Number of impacts receiving 5dBA reduction: {}".format(\
-                              self.ben_and_imp_num)
-		print "Impacts (%) receiving 5dBA reduction: {}".format(\
-                              self.perc_imp_benefitted)
-		print "Benefits receiving 8dBA reduction: {} ({})".format(\
-                              len(self.reas_red_recs), self.reas_red_num) 
-		print "Benefits (%) receiving reasonable reduction: {}".format(\
-                              self.perc_ben_reasonable) 
-		print "Barrier design is feasible: {}".format(\
-                              self.feasible)
-		print "Barrier design is reasonable: {}".format(\
-                              self.reasonable)
+		pass
+		# print("Receivers/receptors in barrier analysis: {} ({})".format(\
+        #                       len(self.recs_analysis), self.du_analysis))
+		# print "Impacts in barrier analysis: {} ({})".format(\
+        #                       len(self.impacted_recs), self.impact_num)
+		# print "Benefits in barrier analysis: {} ({})".format(\
+        #                       len(self.benefitted), self.benefit_num)
+		# print "Number of impacts receiving 5dBA reduction: {}".format(\
+        #                       self.ben_and_imp_num)
+		# print "Impacts (%) receiving 5dBA reduction: {}".format(\
+        #                       self.perc_imp_benefitted)
+		# print "Benefits receiving 8dBA reduction: {} ({})".format(\
+        #                       len(self.reas_red_recs), self.reas_red_num) 
+		# print "Benefits (%) receiving reasonable reduction: {}".format(\
+        #                       self.perc_ben_reasonable) 
+		# print "Barrier design is feasible: {}".format(\
+        #                       self.feasible)
+		# print "Barrier design is reasonable: {}".format(\
+        #                       self.reasonable)
 
-class GAAnalysis(Analysis):
-    def __init__(self, wbname, barsheet, sndsheet, barcost=0):
-        super(GAAnalysis, self).__init__(wbname, barsheet, sndsheet, barcost=0)
-	@property
-	def feasible(self):
-		"""
-        Barrier design is feasible if one or more of impacted receivers
-        receive a 5dBA or more noise reduction
-        """
-        if self.ben_and_imp_num >= 1:
-            return True
-        return False
+# class GAAnalysis(Analysis):
+#     def __init__(self, wbname, barsheet, sndsheet, barcost=0):
+#         super(GAAnalysis, self).__init__(wbname, barsheet, sndsheet, barcost=0)
+# 	@property
+# 	def feasible(self):
+# 		"""
+#         Barrier design is feasible if one or more of impacted receivers
+#         receive a 5dBA or more noise reduction
+#         """
+#         if self.ben_and_imp_num >= 1:
+#             return True
+#         return False
 
-	@property
-	def reasonable(self):
-		"""
-        Barrier design is reasonable if 80% or more of benefitted receivers
-        receive a 8dBA or more noise reduction
-        """
-		perc_crit = self.benefit_num * 0.80
-		if perc_crit == 0:
-			return False
-		elif self.reas_red_num >= perc_crit:
-			return True
-		else:
-			return False
+# 	@property
+# 	def reasonable(self):
+# 		"""
+#         Barrier design is reasonable if 80% or more of benefitted receivers
+#         receive a 8dBA or more noise reduction
+#         """
+# 		perc_crit = self.benefit_num * 0.80
+# 		if perc_crit == 0:
+# 			return False
+# 		elif self.reas_red_num >= perc_crit:
+# 			return True
+# 		else:
+# 			return False
 
-gaanalysis = GAAnalysis(r'C:\Users\bbatt\Dropbox\!Python\pytnm\tests\test_files\test.xlsx', 'Sheet2', 'Bars1_2_3_Snd')
+if __name__ == '__main__':
+	os.chdir(os.path.dirname(__file__))
+	model_xlsx = '../files/tnm_model.xlsx'
+	print(_read_roadways(model_xlsx))
