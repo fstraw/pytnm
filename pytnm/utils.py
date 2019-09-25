@@ -7,27 +7,6 @@ import os
 import shapefile
 import openpyxl
 
-# def tnm_feature_to_list(wbname, ws):
-#     """ Returns filtered list of specified feature. Requires spreadsheet with named worksheet"""
-#     wb = openpyxl.load_workbook(wbname)
-#     feat_ws = wb[ws]
-#     feats = []
-#     for row in feat_ws.rows:
-#         vals = [cell.value for cell in row]
-#         feats.append(vals)
-#     feats_no_header = feats[15:] #clip TNM2.5 header
-#     features = []
-#     for feat in feats_no_header:
-#         rd_name, rd_width = rd[1], rd[2]
-#         x, y, z = rd[6], rd[7], rd[8]
-#         if rd_name:
-#             roads.append([rd_name, rd_width, [[x, y, z]]])
-#             found_road = True
-#         else:
-#             found_road = False
-#             if not found_road:
-#                 roads[-1][2].append([x, y, z])
-#     return roads
 
 def bar_point_id_xy_dict(wbname, ws='Barriers'):
     wb = openpyxl.load_workbook(wbname)
@@ -244,17 +223,20 @@ def append_tnm_traffic(wbname, ws='Traffic'):
 
 
 if __name__ == '__main__':
-    os.chdir(os.path.dirname(__file__))    
-    wbname = '../files/00013914.xlsx'
-    rdshp = r'../files/roads'
-    barshp = r'../files/barriers'
-    barsegshp = r'../files/exbars'
+    os.chdir(os.path.dirname(__file__))
+    for f in os.listdir(r'C:\TNM25\!Reviews\0013915-I285ESEL\0013914 Ex and NB TNM\Existing'):
+        run_name = (f.replace(' ', ''))
+        dir_name = r'C:\TNM25\!Reviews\0013915-I285ESEL\MyProject9\DATA'
+        wbname = '../files/0013915_{}.xlsx'.format(f)
+        rdshp = os.path.join(dir_name, 'roads_{}'.format(run_name))
+        barshp =os.path.join(dir_name, 'barriers_{}'.format(run_name))
+        barsegshp = os.path.join(dir_name, 'exbars_{}'.format(run_name))
 
-    barslist = barriers_to_list(wbname, ws='Barriers')
-    bars_list_to_shape(barslist, barshp)
-    traffic_dict = append_tnm_traffic(wbname, ws='Traffic')
-    rdslist = rds_to_list(wbname, ws='Roads')
-    rds_list_to_shape(rdslist, rdshp, traffic_dict)    
-    barsegs = group_barrier_segments_by_height(wbname)
-    bar_segs_list_to_shape(barsegs, barsegshp)
-    t = get_last_barrier_seg_pointid(wbname)
+        barslist = barriers_to_list(wbname, ws='Barriers')
+        bars_list_to_shape(barslist, barshp)
+        traffic_dict = append_tnm_traffic(wbname, ws='Traffic')
+        rdslist = rds_to_list(wbname, ws='Roads')
+        rds_list_to_shape(rdslist, rdshp, traffic_dict)    
+        barsegs = group_barrier_segments_by_height(wbname)
+        bar_segs_list_to_shape(barsegs, barsegshp)
+        t = get_last_barrier_seg_pointid(wbname)
