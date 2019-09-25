@@ -14,7 +14,7 @@ def _xlsx_to_traffic(ws):
     """ Converts .xlsx spreadsheet of TNM Traffic to dictionary """
     filter_rows = 7 ##omit these rows at start of spreadsheet    
     traf_ws = ws
-    traf_dict = dict([(r[1].value.strip(), (r[5].value, r[7].value, r[9].value))
+    traf_dict = dict([(r[1].value.strip(), ((r[5].value, r[6].value), (r[7].value, r[8].value), (r[9].value, r[10].value)))
                     for r in traf_ws.rows if r[1].value][filter_rows:])
     return traf_dict
 
@@ -67,7 +67,32 @@ def _read_traffic(xlsx):
 		print('Traffic worksheet not found')
 	return(_xlsx_to_traffic(traffic_worksheet))
 
+class VehicleClassification(object):
+	def __init__(self, volume, speed):
+		self.volume = volume
+		self.speed = speed
+
+class Auto(VehicleClassification):
+	def __repr__(self):
+		return 'auto'
+
+class Medium(VehicleClassification):
+	def __repr__(self):
+		return 'medium'
+
+class Heavy(VehicleClassification):
+	def __repr__(self):
+		return 'heavy'
+
 class Traffic(object):
+	"""Represents Traffic TNM object
+	
+	Arguments:
+		object {[type]} -- [description]
+	
+	Returns:
+		[type] -- [description]
+	"""
 	def __init__(self, auto, medium, heavy, bus=None, motorcycle=None):
 		self.auto = auto
 		self.medium = medium
@@ -124,9 +149,9 @@ class Model(object):
 	>> ((123456, 4355422, 12), (123456, 4355422, 15), (123456, 4355422, 12))
 	>> print(roadway.traffic)
 	>> (125, 10, 5, 3, 1)
-	>> print(roadway.traffic.autos)
+	>> print(roadway.traffic.auto)
 	>> 125
-	>> print(roadway.traffic.autos.speed)
+	>> print(roadway.traffic.auto.speed)
 	>> 45
 
 	Arguments:
@@ -140,10 +165,14 @@ class Model(object):
 	def roadways(self):
 		roads = []
 		for road in self._roads:
-			roads.append(Roadway(name=road[0], width=road[1], points=road[2], 
-				traffic=Traffic(auto=self.TRAFFIC[road[0]][0],
-						medium=self.TRAFFIC[road[0]][1],
-						heavy=self.TRAFFIC[road[0]][2])))
+			name = road[0]
+			width = road[1]
+			points = road[2]
+			autos = self.TRAFFIC[name][0]
+			medium = self.TRAFFIC[name][1]
+			heavy = self.TRAFFIC[name][2]
+			traffic = Traffic(Auto(autos[0], autos[1]), Medium(medium[0], medium[1]), Heavy(heavy[0], heavy[1]))
+			roads.append(Roadway(name, width, points, traffic))
 		return roads
 
 		
@@ -356,7 +385,9 @@ if __name__ == '__main__':
 	build_model = Model(model_xlsx)
 	roadways = build_model.roadways	
 	for roadway in roadways:
-		print(roadway.traffic.auto)
+		print(roadway.traffic.auto.speed)
+		print(roadway.traffic.medium.speed)
+		print(roadway.traffic.heavy.speed)
 
 	
 	
