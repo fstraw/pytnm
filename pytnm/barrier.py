@@ -18,7 +18,26 @@ def _xlsx_to_traffic(ws):
                     for r in traf_ws.rows if r[1].value][filter_rows:])
     return traf_dict
 
-def rds_to_list(ws):
+def _receivers_to_list(ws):
+	receivers_raw = []	
+	for row in ws.rows:
+		vals = [cell.value for cell in row]
+		receivers_raw.append(vals)
+	receivers_no_header = receivers_raw[16:] # clip TNM2.5 header
+	receivers = []
+	for receiver in receivers_no_header:
+		rec_id = receiver[1]
+		receptors = receiver[3]
+		x, y, z = receiver[4], receiver[5], receiver[6]
+		height = receiver[7]
+		nac_level = receiver[9]
+		if None in (x, y, z):
+			break
+		else:
+			receivers.append((rec_id.strip(), receptors, height, nac_level, (x, y, z)))
+	return receivers
+			
+def _rds_to_list(ws):
     """
     Returns filtered list of roads    
     :param ws: 
@@ -29,14 +48,14 @@ def rds_to_list(ws):
     for row in roads_ws.rows:
         vals = [cell.value for cell in row]
         rds.append(vals)
-    rds_no_header = rds[15:] #clip TNM2.5 header
+    rds_no_header = rds[15:] # clip TNM2.5 header
     roads = []
     for rd in rds_no_header:
         rd_name = rd[1]
         rd_width = rd[2]
         pnt = rd[4].strip()
         x, y, z = rd[6], rd[7], rd[8]
-        #check for empty end rows
+        # check for empty end rows
         if None in (x, y, z):
             break
         if rd_name:
@@ -57,7 +76,7 @@ def _read_roadways(xlsx):
 		roadways_worksheet = [ws for ws in workbook.worksheets if ws['B5'].value == 'INPUT: ROADWAYS'][0]
 	except IndexError:
 		print('Roadways worksheet not found')
-	return(rds_to_list(roadways_worksheet))
+	return(_rds_to_list(roadways_worksheet))
 
 def _read_traffic(xlsx):
 	workbook = p.load_workbook(xlsx)
@@ -66,6 +85,14 @@ def _read_traffic(xlsx):
 	except IndexError:
 		print('Traffic worksheet not found')
 	return(_xlsx_to_traffic(traffic_worksheet))
+
+def _read_receivers(xlsx):
+	workbook = p.load_workbook(xlsx)
+	try:
+		receiver_worksheet = [ws for ws in workbook.worksheets if ws['B5'].value == 'INPUT: RECEIVERS'][0]
+	except IndexError:
+		print('Receiver worksheet not found')
+	return(_receivers_to_list(receiver_worksheet))
 
 class VehicleClassification(object):
 	def __init__(self, volume, speed):
@@ -122,7 +149,19 @@ class Roadway(object):
 
 
 class Receiver(object):
-	pass
+	"""Represents Receiver TNM object
+	
+	Arguments:
+		object {[type]} -- [description]
+	"""
+	def __init__(self, rec_id, receptors, height, nac_level, geometry, nac=None):
+		self.rec_id = rec_id
+		self.receptors = receptors
+		self.height = height
+		self.nac_level = nac_level
+		self.geometry = geometry
+	def __repr__(self):
+		return self.rec_id
 
 class Barrier(object):
 	pass
@@ -161,6 +200,20 @@ class Model(object):
 	def __init__(self, xlsx):
 		self.TRAFFIC = _read_traffic(xlsx)
 		self._roads = _read_roadways(xlsx)
+		self._receivers = _read_receivers(xlsx)
+		
+	@property
+	def receivers(self):
+		receivers = []		
+		for receiver in self._receivers:
+			rec_id = receiver[0]
+			receptors = receiver[1]			
+			height = receiver[2]
+			nac_level = receiver[3]
+			x, y, z = receiver[4]
+			receivers.append(Receiver(rec_id, receptors, height, nac_level, geometry=(x, y, z)))
+		return receivers
+
 	@property	
 	def roadways(self):
 		roads = []
@@ -384,10 +437,13 @@ if __name__ == '__main__':
 	model_xlsx = '../files/tnm_model.xlsx'
 	build_model = Model(model_xlsx)
 	roadways = build_model.roadways	
-	for roadway in roadways:
-		print(roadway.traffic.auto.speed)
-		print(roadway.traffic.medium.speed)
-		print(roadway.traffic.heavy.speed)
+	# for roadway in roadways:
+	# 	print(roadway.traffic.auto.speed)
+	# 	print(roadway.traffic.medium.speed)
+	# 	print(roadway.traffic.heavy.speed)
+	receivers = build_model.receivers
+	for receiver in receivers:
+		print(receiver)
 
 	
 	
