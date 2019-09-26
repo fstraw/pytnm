@@ -11,12 +11,50 @@ import openpyxl as p
 
 
 def _xlsx_to_traffic(ws):
-    """ Converts .xlsx spreadsheet of TNM Traffic to dictionary """
+    """Converts .xlsx spreadsheet of TNM Traffic to dictionary
+	
+	Arguments:
+		ws {openpyxl.worksheet} -- [description]
+	
+	Returns:
+		[type] -- [description]
+	"""
     filter_rows = 7 ##omit these rows at start of spreadsheet    
     traf_ws = ws
     traf_dict = dict([(r[1].value.strip(), ((r[5].value, r[6].value), (r[7].value, r[8].value), (r[9].value, r[10].value)))
                     for r in traf_ws.rows if r[1].value][filter_rows:])
     return traf_dict
+
+def _barriers_to_list(ws):
+    """Returns filtered list of barriers
+	
+	Arguments:
+		ws {openpyxl.worksheet} -- [description]
+	
+	Returns:
+		[type] -- [description]
+	"""
+    barriers_ws = ws
+    bars = []
+    for row in barriers_ws.rows:
+        vals = [cell.value for cell in row]
+        bars.append(vals)
+    bars_no_header = bars[15:] # clip TNM2.5 header
+    barriers = []
+    for bar in bars_no_header:
+        bar_name, bar_max_height, square_foot_cost = bar[1], bar[4], bar[5]
+        x, y, z = bar[13], bar[14], bar[15]
+        # check for empty end rows
+        if None in (x, y, z):
+            break
+        if bar_name:
+            barriers.append((bar_name, bar_max_height, square_foot_cost, [(x, y, z)]))
+            found_bar = True
+        else:
+            found_bar = False
+            if not found_bar:
+                barriers[-1][3].append((x, y, z))
+    return barriers
 
 def _receivers_to_list(ws):
 	receivers_raw = []	
@@ -94,6 +132,14 @@ def _read_receivers(xlsx):
 		print('Receiver worksheet not found')
 	return(_receivers_to_list(receiver_worksheet))
 
+def _read_barriers(xlsx):
+	workbook = p.load_workbook(xlsx)
+	try:
+		barrier_worksheet = [ws for ws in workbook.worksheets if ws['B5'].value == 'INPUT: BARRIERS'][0]
+	except IndexError:
+		print('Barrier worksheet not found')
+	return(_barriers_to_list(barrier_worksheet))
+
 class VehicleClassification(object):
 	def __init__(self, volume, speed):
 		self.volume = volume
@@ -101,15 +147,15 @@ class VehicleClassification(object):
 
 class Auto(VehicleClassification):
 	def __repr__(self):
-		return 'auto'
+		return 'Auto'
 
 class Medium(VehicleClassification):
 	def __repr__(self):
-		return 'medium'
+		return 'Medium'
 
 class Heavy(VehicleClassification):
 	def __repr__(self):
-		return 'heavy'
+		return 'Heavy'
 
 class Traffic(object):
 	"""Represents Traffic TNM object
@@ -164,7 +210,21 @@ class Receiver(object):
 		return self.rec_id
 
 class Barrier(object):
-	pass
+	"""Represents Barrier TNM object
+	
+	Arguments:
+		object {[type]} -- [description]
+	
+	Returns:
+		[type] -- [description]
+	"""
+	def __init__(self, name, max_height, geometry, square_foot_cost=0):
+		self.name = name
+		self.max_height = max_height
+		self.geometry = geometry
+		self.square_foot_cost = square_foot_cost
+	def __repr__(self):
+		return self.name
 
 class TerrainLine(object):
 	pass
@@ -201,7 +261,18 @@ class Model(object):
 		self.TRAFFIC = _read_traffic(xlsx)
 		self._roads = _read_roadways(xlsx)
 		self._receivers = _read_receivers(xlsx)
-		
+		self._barriers = _read_barriers(xlsx)
+	
+	@property
+	def barriers(self):
+		barriers = []
+		for barrier in self._barriers:
+			name = barrier[0]
+			max_height = barrier[1]
+			geometry = barrier[2]
+			barriers.append(Barrier(name, max_height, geometry))		
+		return barriers
+
 	@property
 	def receivers(self):
 		receivers = []		
@@ -226,9 +297,7 @@ class Model(object):
 			heavy = self.TRAFFIC[name][2]
 			traffic = Traffic(Auto(autos[0], autos[1]), Medium(medium[0], medium[1]), Heavy(heavy[0], heavy[1]))
 			roads.append(Roadway(name, width, points, traffic))
-		return roads
-
-		
+		return roads		
 
 class Analysis(object):
 	"""Barrier analysis class
@@ -441,9 +510,10 @@ if __name__ == '__main__':
 	# 	print(roadway.traffic.auto.speed)
 	# 	print(roadway.traffic.medium.speed)
 	# 	print(roadway.traffic.heavy.speed)
-	receivers = build_model.receivers
-	for receiver in receivers:
-		print(receiver)
-
-	
-	
+	# receivers = build_model.receivers	
+	# for receiver in receivers:
+	# 	print(receiver)
+	barriers = build_model.barriers
+	print(barriers)
+	for barrier in barriers:
+		print(barrier)
