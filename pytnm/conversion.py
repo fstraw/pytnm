@@ -8,7 +8,6 @@ Created on Thu Apr 14 13:31:11 2016
 import openpyxl
 import shapefile
 
-xlsx = r'C:\Users\brbat\Dropbox\!Python\pytnm\pytnm\Build_Geom_Test.xlsx'
 
 def _xlsx_to_traffic(xlsx):
     """ Converts .xlsx spreadsheet of TNM Traffic to dictionary """
@@ -62,6 +61,7 @@ def tnm_rds_to_fc(fc_list, output):
     w.save(output)
 
 if __name__ == '__main__':
+    xlsx = r"C:\Users\brbatt\PyCharmProjects\pytnm\files\segment1.xlsx"
     x = _xlsx_to_traffic(xlsx)   
     t = xlsx_to_list(xlsx)
-    l = tnm_rds_to_fc(t, r'C:\Users\bbatt\Dropbox\!Python\pytnm\tests\test_files\test_shp')
+    l = tnm_rds_to_fc(t, r'J:\55283blr\Doc\Noise\2019\GIS\DATA\segment1')

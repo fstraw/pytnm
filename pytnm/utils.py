@@ -154,7 +154,7 @@ def group_barrier_segments_by_height(wbname, ws='Barrier_Segments'):
     return barriers
 
 def rds_list_to_shape(rdslist, outputshp, traf_dict=None):
-    w = shapefile.Writer(shapefile.POLYLINEZ)
+    w = shapefile.Writer(shapeType=shapefile.POLYLINEZ)
     w.field('Rd_Name', 'C', size=32)
     w.field('Width', 'N')
     w.field('Auto', 'N')
@@ -224,19 +224,19 @@ def append_tnm_traffic(wbname, ws='Traffic'):
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(__file__))
-    for f in os.listdir(r'C:\TNM25\!Reviews\0013915-I285ESEL\0013914 Ex and NB TNM\Existing'):
-        run_name = (f.replace(' ', ''))
-        dir_name = r'C:\TNM25\!Reviews\0013915-I285ESEL\MyProject9\DATA'
-        wbname = '../files/0013915_{}.xlsx'.format(f)
-        rdshp = os.path.join(dir_name, 'roads_{}'.format(run_name))
-        barshp =os.path.join(dir_name, 'barriers_{}'.format(run_name))
-        barsegshp = os.path.join(dir_name, 'exbars_{}'.format(run_name))
+    xlsx = r"C:\Users\brbatt\PyCharmProjects\pytnm\files\segment4.xlsx"
+    run_name = 'segment4'
+    dir_name = r'J:\55283blr\Doc\Noise\2019\GIS\DATA'
+    wbname = xlsx
+    rdshp = os.path.join(dir_name, 'roads_{}'.format(run_name))
+    # barshp =os.path.join(dir_name, 'barriers_{}'.format(run_name))
+    # barsegshp = os.path.join(dir_name, 'exbars_{}'.format(run_name))
 
-        barslist = barriers_to_list(wbname, ws='Barriers')
-        bars_list_to_shape(barslist, barshp)
-        traffic_dict = append_tnm_traffic(wbname, ws='Traffic')
-        rdslist = rds_to_list(wbname, ws='Roads')
-        rds_list_to_shape(rdslist, rdshp, traffic_dict)    
-        barsegs = group_barrier_segments_by_height(wbname)
-        bar_segs_list_to_shape(barsegs, barsegshp)
-        t = get_last_barrier_seg_pointid(wbname)
+    # barslist = barriers_to_list(wbname, ws='Barriers')
+    # bars_list_to_shape(barslist, barshp)
+    traffic_dict = append_tnm_traffic(wbname, ws='Traffic')
+    rdslist = rds_to_list(wbname, ws='Roads')
+    rds_list_to_shape(rdslist, rdshp, traffic_dict)    
+    # barsegs = group_barrier_segments_by_height(wbname)
+    # bar_segs_list_to_shape(barsegs, barsegshp)
+    # t = get_last_barrier_seg_pointid(wbname)
