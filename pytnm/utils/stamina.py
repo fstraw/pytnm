@@ -110,11 +110,14 @@ def _write_receivers(receiver_feature_class):
             receiver_string += "{} {} {} {}\n".format(rec_id, x, y, z)
         return receiver_string
 
-def _write_stamina_file(file_path, condition, roadways=None, barriers=None, receivers=None):
+def write_stamina_file(file_path, condition, roadways=None, barriers=None, receivers=None):
     stamina_string = "1,3\n"
-    stamina_string += _write_roadways(roadways, condition)
-    stamina_string += _write_barriers(barriers)
-    stamina_string += _write_receivers(receivers)
+    if roadways:
+        stamina_string += _write_roadways(roadways, condition)
+    if barriers:
+        stamina_string += _write_barriers(barriers)
+    if receivers:
+        stamina_string += _write_receivers(receivers)
     stamina_string += "7/\n"
     file_obj = open(os.path.join(file_path, "{}.dat".format(condition)), "w")
     file_obj.write(stamina_string)
@@ -128,4 +131,4 @@ if __name__ == '__main__':
     os.chdir(dir_path)    
     test_road_geom = [row[0] for row in SearchCursor(test_existing_roadway, "SHAPE@")][0]
     test_barrier_geom = [row[0] for row in SearchCursor(test_barrier, "SHAPE@")][0]
-    print(_write_stamina_file(r"C:\TNM25\Program", "EXISTING", test_existing_roadway, test_barrier, test_receiver))
+    print(write_stamina_file(r"C:\TNM25\Program", "EXISTING", test_existing_roadway, test_barrier, test_receiver))
