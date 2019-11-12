@@ -23,25 +23,24 @@ def improvedpoint(x, y, fcsr, rastersr):
         result = 0
     return result
 
-
-def write_roadway_separator():
+def roadway_separator():
     hdr = "'L' /\n"
     return hdr
 
-def write_barrier_separator():
+def barrier_separator():
     hdr = "'A' /\n"
     return hdr
 
 def _write_roadway_points(line_geom):
     point_strings = ""
-    point_strings += write_roadway_separator()
+    point_strings += roadway_separator()
     for part in line_geom:
         for pnt_number, pnt in enumerate(part):
             x = round(pnt.X, 1) 
             y = round(pnt.Y, 1)
             z = round(pnt.Z, 1)            
             point_strings += "'Point{}' {} {} {} 0\n".format(pnt_number, x, y, z)
-        point_strings += write_roadway_separator()
+        point_strings += roadway_separator()
         return point_strings
 
 def _write_roadway_attrs(roadway_feature_class, condition):
@@ -68,7 +67,6 @@ def _write_roadway_attrs(roadway_feature_class, condition):
             roadway_string += _write_roadway_points(geometry)
         return roadway_string
 
-
 def _write_barrier_points(line_geom):
     point_strings = ""
     # set constants for barrier defaults    
@@ -86,8 +84,24 @@ def _write_barrier_points(line_geom):
                     pnt_number, x, y, barrier_height, z, NUMBER_OF_PERTURBATIONS, PERTURBATION_INCREMENT)                
             else:
                 point_strings += "'Point{}' {} {} {} {}\n".format(pnt_number, x, y, barrier_height, z)
+        point_strings += barrier_separator()
         return point_strings
-  
+
+def _write_barrier_attrs(barrier_feature_class):
+    """Creates string of barrier attributes
+    
+    Arguments:
+        barrier_feature_class {String} -- Path to feature class        
+    """    
+    with arcpy.da.SearchCursor(barrier_feature_class, ("name", "SHAPE@")) as cursor:
+        barrier_string = ""
+        for row in cursor:
+            name = row[0]
+            geometry = row[1]
+            barrier_string += "{}\n".format(name)
+            barrier_string += _write_barrier_points(geometry)
+        return barrier_string
+
 def improvedrecpnts(fc, fcsr, rastersr):
     reccount = arcpy.GetCount_management(fc).getOutput(0)
     f.write("5,{}\n".format(reccount))
@@ -115,54 +129,6 @@ def improvedrecpnts(fc, fcsr, rastersr):
             arcpy.SetProgressorPosition()
         arcpy.ResetProgressor()
 
-# Identify roadway polyline feature,
-# and the raster from which to pull 
-# values. Does not require z-enable feature
-
-def improvedbarrier(fc, rast):
-    fcdesc, rastdesc = arcpy.Describe(fc), arcpy.Describe(rast)
-    fcsr, rastersr = fcdesc.spatialReference, rastdesc.spatialReference
-    barriercount = arcpy.GetCount_management(fc).getOutput(0)
-    f.write("3,{}\n".format(barriercount))
-    arcpy.SetProgressor("step", "Processing Barriers...", 0, int(barriercount), 1)
-    with arcpy.da.SearchCursor(fc, ["Id", "SHAPE@"]) as cursor:
-        for row in cursor:
-            barrier, geometry = row[0], row[1]
-            arcpy.SetProgressorLabel("Processing Barrier {0}...".format(barrier))
-            f.write("Barrier {}\n".format(barrier))
-            improvedwritepnts(geometry, fcsr, rastersr, "BARRIER")
-            arcpy.SetProgressorPosition()
-        arcpy.ResetProgressor()
-        
-def improvedroadway(fc, rast):
-    fcdesc, rastdesc = arcpy.Describe(fc), arcpy.Describe(rast)
-    fcsr, rastersr = fcdesc.spatialReference, rastdesc.spatialReference
-    roadcount = arcpy.GetCount_management(fc).getOutput(0)
-    write_header(f)
-    f.write("2,{}\n".format(roadcount))
-    arcpy.SetProgressor("step", "Processing Roadways...", 0, int(roadcount), 1)
-    with arcpy.da.SearchCursor(fc, validatefields(fc, condition)) as cursor:
-        for row in cursor:
-            road, speed, auto, medium, heavy, geometry = row[0], row[1], round(row[2], 0), round(row[3], 0), round(row[4], 0), row[5]
-            arcpy.SetProgressorLabel("Processing {0}...".format(road))
-            f.write("{}\n".format(road))
-            f.write("CARS {} {}\n".format(auto, speed))
-            f.write("MT {} {}\n".format(medium, speed))
-            f.write("HT {} {}\n".format(heavy, speed))
-            improvedwritepnts(geometry, fcsr, rastersr)
-            arcpy.SetProgressorPosition()
-        arcpy.ResetProgressor()
-        if barrierfile:
-            improvedbarrier(barrierfile, rast)
-        else:
-            pass
-        improvedrecpnts(receiverfile, fcsr, rastersr)
-        f.write("7/\n")
-        f.close()
-
-#Experimental code to place Z coordinates from raster surface
-#directly into Z-enabled feature class.
-#have to use old UpdateCursor (bleh)
 def calculateroadwayz(fc, rast):
     cursor = arcpy.UpdateCursor(fc)
     shapeName = arcpy.Describe(fc).shapeFieldName
@@ -212,6 +178,7 @@ if __name__ == '__main__':
     os.chdir(dir_path)    
     test_road_geom = [row[0] for row in arcpy.da.SearchCursor(test_existing_roadway, "SHAPE@")][0]
     test_barrier_geom = [row[0] for row in arcpy.da.SearchCursor(test_barrier, "SHAPE@")][0]
-    print(_write_roadway_points(test_road_geom))
-    print(_write_barrier_points(test_barrier_geom))
+    # print(_write_roadway_points(test_road_geom))
+    # print(_write_barrier_points(test_barrier_geom))
     print(_write_roadway_attrs(test_existing_roadway, 'Existing'))
+    print(_write_barrier_attrs(test_barrier))
