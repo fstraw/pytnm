@@ -1,27 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import arcpy
+from arcpy.da import SearchCursor
 
 from validation import validate_roadway_fields
 
 
 def write_header(f):
-    f.write("1,3\n")
-                
-
-def improvedpoint(x, y, fcsr, rastersr):
-    """
-    Retrieves value from raster, given an X, Y coordinate
-    """
-    point = arcpy.Point(x,y)    
-    pnttrans = arcpy.PointGeometry(point,fcsr).projectAs(rastersr).firstPoint
-    cellvalue = arcpy.GetCellValue_management(rast, "{} {}".format(
-                                                pnttrans.X, pnttrans.Y))
-    if boolZ == True:
-        result = round(float(cellvalue.getOutput(0)) * 3.2808399, 1) #convert to feet
-    else:
-        result = 0
-    return result
+    f.write("1,3\n")             
 
 def roadway_separator():
     hdr = "'L' /\n"
@@ -43,7 +29,7 @@ def _write_roadway_points(line_geom):
         point_strings += roadway_separator()
         return point_strings
 
-def _write_roadway_attrs(roadway_feature_class, condition):
+def _write_roadways(roadway_feature_class, condition):
     """Creates string of roadway attributes
     
     Arguments:
@@ -51,8 +37,9 @@ def _write_roadway_attrs(roadway_feature_class, condition):
         condition {String} -- Existing, NoBuild, or Build. Determines fields to use from geospatial template
     """
     flds = validate_roadway_fields(roadway_feature_class, condition.upper()) 
-    with arcpy.da.SearchCursor(roadway_feature_class, flds) as cursor:
-        roadway_string = ""
+    roadway_count = len([row for row in SearchCursor(roadway_feature_class, "*")])
+    with SearchCursor(roadway_feature_class, flds) as cursor:
+        roadway_string = "2,{}\n".format(roadway_count)
         for row in cursor:
             road = row[0]
             speed = row[1]
@@ -69,10 +56,10 @@ def _write_roadway_attrs(roadway_feature_class, condition):
 
 def _write_barrier_points(line_geom):
     point_strings = ""
-    # set constants for barrier defaults    
-    NUMBER_OF_PERTURBATIONS = 2
-    PERTURBATION_INCREMENT = 9
-    BARRIER_INITIAL_HEIGHT = 7
+    # set constants for barrier defaults
+    PERTURBATION_INCREMENT = 2 
+    NUMBER_OF_PERTURBATIONS = 15    
+    BARRIER_INITIAL_HEIGHT = 0
     for part in line_geom:
         for pnt_number, pnt in enumerate(part):
             x = round(pnt.X, 1)
@@ -81,20 +68,21 @@ def _write_barrier_points(line_geom):
             barrier_height = z + BARRIER_INITIAL_HEIGHT
             if pnt_number == 0:
                 point_strings += "'Point{}' {} {} {} {} {} {}\n".format(
-                    pnt_number, x, y, barrier_height, z, NUMBER_OF_PERTURBATIONS, PERTURBATION_INCREMENT)                
+                    pnt_number, x, y, barrier_height, z, PERTURBATION_INCREMENT, NUMBER_OF_PERTURBATIONS)                
             else:
                 point_strings += "'Point{}' {} {} {} {}\n".format(pnt_number, x, y, barrier_height, z)
         point_strings += barrier_separator()
         return point_strings
 
-def _write_barrier_attrs(barrier_feature_class):
+def _write_barriers(barrier_feature_class):
     """Creates string of barrier attributes
     
     Arguments:
         barrier_feature_class {String} -- Path to feature class        
-    """    
-    with arcpy.da.SearchCursor(barrier_feature_class, ("name", "SHAPE@")) as cursor:
-        barrier_string = ""
+    """
+    barrier_count = len([row for row in SearchCursor(barrier_feature_class, "*")])
+    with SearchCursor(barrier_feature_class, ("name", "SHAPE@")) as cursor:
+        barrier_string = "3,{}\n".format(barrier_count)
         for row in cursor:
             name = row[0]
             geometry = row[1]
@@ -109,10 +97,10 @@ def _write_receivers(receiver_feature_class):
     Arguments:
         receiver_feature_class {[String]} -- Path to receiver feature class
     """
-    receiver_count = len([row for row in arcpy.da.SearchCursor(receiver_feature_class, "*")])
+    receiver_count = len([row for row in SearchCursor(receiver_feature_class, "*")])
     receiver_string = "5,{}\n".format(receiver_count)
     receiver_string += "RECEIVERS\n"
-    with arcpy.da.SearchCursor(receiver_feature_class, ["rec_id", "bldg_hgt", "SHAPE@X", "SHAPE@Y", "SHAPE@Z"]) as cursor:
+    with SearchCursor(receiver_feature_class, ["rec_id", "bldg_hgt", "SHAPE@X", "SHAPE@Y", "SHAPE@Z"]) as cursor:
         for row in cursor:            
             rec_id = row[0]
             bldg_hgt = row[1]            
@@ -122,47 +110,15 @@ def _write_receivers(receiver_feature_class):
             receiver_string += "{} {} {} {}\n".format(rec_id, x, y, z)
         return receiver_string
 
-def calculateroadwayz(fc, rast):
-    cursor = arcpy.UpdateCursor(fc)
-    shapeName = arcpy.Describe(fc).shapeFieldName
-    for row in cursor:
-        geom = row.getValue(shapeName)
-        newGeom = arcpy.Array()
-        for part in geom:
-            newPart = arcpy.Array()
-            for pnt in part:
-                if pnt != None:
-                    newPnt = arcpy.Point(pnt.X, pnt.Y, improvedpoint(pnt.X, pnt.Y, arcpy.Describe(fc).spatialReference, arcpy.Describe(rast).spatialReference))
-                    newPart.add(newPnt)
-            newGeom.add(newPart)
-        newShape = arcpy.Polyline(newGeom)
-        row.setValue(shapeName, newShape)
-        cursor.updateRow(row)
-    del row, cursor
-    
-    with arcpy.da.SearchCursor(fc, "SHAPE@") as cursor:
-        for row in cursor:
-            for part in row[0]:
-                for pnt in part:                
-                    print(pnt.X, pnt.Y, pnt.Z)
-
-def add_z_to_points(fc, rast, zfactor):
-    """ Add Z value to Z-enabled point feature class"""
-    desc = arcpy.Describe(fc)
-    fcspatref = desc.spatialReference
-    if not desc.hasZ:
-        raise ValueError('Input feature class must be Z-enabled!')
-    if fcspatref == "Unknown":
-        raise ValueError("Projection of {} is undefined! Define projection and try again.".format(desc.name))
-    with arcpy.da.UpdateCursor(fc, ('SHAPE@X', 'SHAPE@Y', 'SHAPE@Z')) as ucursor:
-        for row in ucursor:
-            x = row[0]
-            y = row[1]
-            z = improvedpoint(x, y, fcspatref, rast, zfactor)
-            newpnt = arcpy.Point(x, y, z)
-            newpntGeom = arcpy.PointGeometry(newpnt)
-            row[2] = z
-            ucursor.updateRow(row)
+def _write_stamina_file(file_path, condition, roadways=None, barriers=None, receivers=None):
+    stamina_string = "1,3\n"
+    stamina_string += _write_roadways(roadways, condition)
+    stamina_string += _write_barriers(barriers)
+    stamina_string += _write_receivers(receivers)
+    stamina_string += "7/\n"
+    file_obj = open(os.path.join(file_path, "{}.dat".format(condition)), "w")
+    file_obj.write(stamina_string)
+    return file_path
 
 if __name__ == '__main__':
     test_existing_roadway = "../../tests/test_files/DATA/existing_roadway.shp"
@@ -170,10 +126,6 @@ if __name__ == '__main__':
     test_receiver = "../../tests/test_files/DATA/receiver.shp"
     dir_path = os.path.dirname(os.path.realpath(__file__))
     os.chdir(dir_path)    
-    test_road_geom = [row[0] for row in arcpy.da.SearchCursor(test_existing_roadway, "SHAPE@")][0]
-    test_barrier_geom = [row[0] for row in arcpy.da.SearchCursor(test_barrier, "SHAPE@")][0]
-    # print(_write_roadway_points(test_road_geom))
-    # print(_write_barrier_points(test_barrier_geom))
-    print(_write_roadway_attrs(test_existing_roadway, 'Existing'))
-    print(_write_barrier_attrs(test_barrier))
-    print(_write_receivers(test_receiver))
+    test_road_geom = [row[0] for row in SearchCursor(test_existing_roadway, "SHAPE@")][0]
+    test_barrier_geom = [row[0] for row in SearchCursor(test_barrier, "SHAPE@")][0]
+    print(_write_stamina_file(r"C:\TNM25\Program", "EXISTING", test_existing_roadway, test_barrier, test_receiver))

@@ -1,21 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 11 10:56:04 2015
-
-Purpose: Quickly assess the feasibility and reasonableness 
-of a given barrier design, given a reduction design goal,
-a reasonable cost, and any other state-specific criteria
-
-@author: Brandon
-"""
-
 from os import path
 
-import nose
+import pytest
 from pytnm.barrier import Analysis
 
 wbname = path.join(path.dirname(__file__), "test_files\\test.xlsx")
-print wbname
+print(wbname)
 #Barrier description worksheet
 bardessheet = "Sheet1"
 #Model sound results that correspond with barrier description worksheet.
@@ -30,7 +19,7 @@ def test_recs_in_analysis_not_empty():
 	There should be some receivers in the excel sheet to analyze
 	"""
 	receiver_list_length = len(b.snd_rec_list)
-	nose.tools.assert_true(receiver_list_length > 0)
+	pytest.assert_true(receiver_list_length > 0)
 
 def test_impacts_included_in_analysis():
 	"""
