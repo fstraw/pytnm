@@ -301,6 +301,72 @@ def create_existing_roadway(input_folder):
         field_domain=None
     )
     af(in_table=existing_roadways, 
+        field_name="auto_ex", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="auto_ex",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=existing_roadways, 
+        field_name="medium_ex", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="medium_ex",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=existing_roadways, 
+        field_name="heavy_ex", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="heavy_ex",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=existing_roadways, 
+        field_name="auto_nb", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="auto_nb",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=existing_roadways, 
+        field_name="medium_nb", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="medium_nb",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=existing_roadways, 
+        field_name="heavy_nb", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="heavy_ex",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=existing_roadways, 
         field_name="med_pct", 
         field_type="FLOAT",
         field_precision=None,
@@ -383,6 +449,39 @@ def create_proposed_roadway(input_folder):
         field_scale=None, 
         field_length=None,
         field_alias="bld_total",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=proposed_roadways, 
+        field_name="auto_bld", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="auto_bld",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=proposed_roadways, 
+        field_name="medium_bld", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="medium_bld",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=proposed_roadways, 
+        field_name="heavy_bld", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="heavy_bld",
         field_is_nullable="NULLABLE",
         field_is_required="NON_REQUIRED",
         field_domain=None

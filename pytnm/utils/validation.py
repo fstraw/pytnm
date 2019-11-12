@@ -20,13 +20,13 @@ def validatespatialreference(fc):
     else:
         arcpy.AddMessage("Projection of input {} is {}. Proceeding...".format(desc.name,desc.spatialReference.name))
 
-def validatefields(roadfc, condition):
+def validate_roadway_fields(roadfc, condition):
     flds = [f.name for f in arcpy.ListFields(roadfc)]
-    if not ("Bld_Tot" in flds or "Ex_Tot" in flds or "NoBld_Tot" in flds):
-        raise ValueError("Valid inputs include: rseg_existing or rseg_build")
-    if condition == "Build":
-        return ("Rd_Name", "Speed", "Auto_Bld", "Medium_Bld", "Heavy_Bld", "SHAPE@")
-    elif condition == "Existing":
-        return ("Rd_Name", "Speed", "Auto_Ex", "Medium_Ex", "Heavy_Ex", "SHAPE@")
-    elif condition == "NoBuild":
-        return ("Rd_Name", "Speed", "Auto_NoBld", "Med_NoBld", "Heav_NoBld", "SHAPE@")  
+    if not ("bld_total" in flds or "ex_total" in flds or "nb_total" in flds):
+        raise ValueError("Feature class must include fields: bld_total, ex_total, nb_total")
+    if condition == "BUILD":
+        return ("road_name", "speed", "auto_bld", "medium_bld", "heavy_bld", "SHAPE@")
+    elif condition == "EXISTING":
+        return ("road_name", "speed", "auto_ex", "medium_ex", "heavy_ex", "SHAPE@")
+    elif condition == "NO_BUILD":
+        return ("road_name", "speed", "auto_nb", "medium_nb", "heavy_nb", "SHAPE@")  

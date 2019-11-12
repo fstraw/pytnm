@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-import arcpy
 import os
+import arcpy
+
+from validation import validate_roadway_fields
 
 
 def write_header(f):
@@ -22,23 +24,50 @@ def improvedpoint(x, y, fcsr, rastersr):
     return result
 
 
-def write_barrier_header():
+def write_roadway_separator():
     hdr = "'L' /\n"
     return hdr
 
-def write_roadway_header():
+def write_barrier_separator():
     hdr = "'A' /\n"
     return hdr
 
 def _write_roadway_points(line_geom):
     point_strings = ""
+    point_strings += write_roadway_separator()
     for part in line_geom:
         for pnt_number, pnt in enumerate(part):
             x = round(pnt.X, 1) 
             y = round(pnt.Y, 1)
-            z = round(pnt.Z, 1)
+            z = round(pnt.Z, 1)            
             point_strings += "'Point{}' {} {} {} 0\n".format(pnt_number, x, y, z)
+        point_strings += write_roadway_separator()
         return point_strings
+
+def _write_roadway_attrs(roadway_feature_class, condition):
+    """Creates string of roadway attributes
+    
+    Arguments:
+        roads_feature_class {String} -- Path to feature class
+        condition {String} -- Existing, NoBuild, or Build. Determines fields to use from geospatial template
+    """
+    flds = validate_roadway_fields(roadway_feature_class, condition.upper()) 
+    with arcpy.da.SearchCursor(roadway_feature_class, flds) as cursor:
+        roadway_string = ""
+        for row in cursor:
+            road = row[0]
+            speed = row[1]
+            auto = round(row[2], 0)
+            medium = round(row[3], 0)
+            heavy = round(row[4], 0)
+            geometry = row[5]
+            roadway_string += "{}\n".format(road)
+            roadway_string += "CARS {} {}\n".format(auto, speed)
+            roadway_string += "MT {} {}\n".format(medium, speed)
+            roadway_string += "HT {} {}\n".format(heavy, speed)
+            roadway_string += _write_roadway_points(geometry)
+        return roadway_string
+
 
 def _write_barrier_points(line_geom):
     point_strings = ""
@@ -185,3 +214,4 @@ if __name__ == '__main__':
     test_barrier_geom = [row[0] for row in arcpy.da.SearchCursor(test_barrier, "SHAPE@")][0]
     print(_write_roadway_points(test_road_geom))
     print(_write_barrier_points(test_barrier_geom))
+    print(_write_roadway_attrs(test_existing_roadway, 'Existing'))
