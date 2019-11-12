@@ -102,32 +102,25 @@ def _write_barrier_attrs(barrier_feature_class):
             barrier_string += _write_barrier_points(geometry)
         return barrier_string
 
-def improvedrecpnts(fc, fcsr, rastersr):
-    reccount = arcpy.GetCount_management(fc).getOutput(0)
-    f.write("5,{}\n".format(reccount))
-    f.write("RECEIVERS\n")
-    arcpy.SetProgressor("step", "Processing Receivers...", 0, int(reccount), 1)
-    with arcpy.da.SearchCursor(fc, ["Rec_ID", "SHAPE@X", "SHAPE@Y"]) as cursor:
+def _write_receivers(receiver_feature_class):
+    """Writes receiver feature class to STAMINA format. This method assumes bldg_hgt field is populated.
+    For elevations, STAMINA import process will subtract 5 feet (or metric equivalent) from provided Z-value 
+    
+    Arguments:
+        receiver_feature_class {[String]} -- Path to receiver feature class
+    """
+    receiver_count = len([row for row in arcpy.da.SearchCursor(receiver_feature_class, "*")])
+    receiver_string = "5,{}\n".format(receiver_count)
+    receiver_string += "RECEIVERS\n"
+    with arcpy.da.SearchCursor(receiver_feature_class, ["rec_id", "bldg_hgt", "SHAPE@X", "SHAPE@Y", "SHAPE@Z"]) as cursor:
         for row in cursor:            
-            recid = round(row[0],1)            
-            x, y = round(row[1],1), round(row[2],1)
-            if "{}".format(recid).endswith("0"):
-                bldgheight = 5
-            elif "{}".format(recid).endswith("1"):
-                bldgheight = 5
-            elif "{}".format(recid).endswith("2"):
-                bldgheight = 15
-            elif "{}".format(recid).endswith("3"):
-                bldgheight = 25
-            elif "{}".format(recid).endswith("4"):
-                bldgheight = 35
-            elif "{}".format(recid).endswith("5"):
-                bldgheight = 45
-            z = improvedpoint(round(row[1],1),round(row[2],1),fcsr,rastersr) + bldgheight  
-            arcpy.SetProgressorLabel("Processing Receiver {0}...".format(recid))
-            f.write("{} {} {} {}\n".format(recid, x, y, z))
-            arcpy.SetProgressorPosition()
-        arcpy.ResetProgressor()
+            rec_id = row[0]
+            bldg_hgt = row[1]            
+            x = round(row[2], 1)
+            y = round(row[3], 1)
+            z = round(row[4], 1) + bldg_hgt
+            receiver_string += "{} {} {} {}\n".format(rec_id, x, y, z)
+        return receiver_string
 
 def calculateroadwayz(fc, rast):
     cursor = arcpy.UpdateCursor(fc)
@@ -174,6 +167,7 @@ def add_z_to_points(fc, rast, zfactor):
 if __name__ == '__main__':
     test_existing_roadway = "../../tests/test_files/DATA/existing_roadway.shp"
     test_barrier = "../../tests/test_files/DATA/barrier.shp"
+    test_receiver = "../../tests/test_files/DATA/receiver.shp"
     dir_path = os.path.dirname(os.path.realpath(__file__))
     os.chdir(dir_path)    
     test_road_geom = [row[0] for row in arcpy.da.SearchCursor(test_existing_roadway, "SHAPE@")][0]
@@ -182,3 +176,4 @@ if __name__ == '__main__':
     # print(_write_barrier_points(test_barrier_geom))
     print(_write_roadway_attrs(test_existing_roadway, 'Existing'))
     print(_write_barrier_attrs(test_barrier))
+    print(_write_receivers(test_receiver))
