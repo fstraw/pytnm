@@ -48,3 +48,8 @@ Temporary Items
 **/*.gdb
 *.tbx
 /gis/Index
+
+#general
+.vscode
+.pytest
+env/

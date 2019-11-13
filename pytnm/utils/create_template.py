@@ -3,7 +3,7 @@ from arcpy import CreateFeatureclass_management as cf
 from arcpy import AddField_management as af
 from arcpy import env
 
-# env.overwriteOutput = True
+env.overwriteOutput = True
 input_folder = r"C:\Users\brbatt\PyCharmProjects\pytnm\gis\DATA"
 
 def create_receivers(input_folder):
@@ -700,7 +700,110 @@ def create_field_measurements(input_folder):
         field_is_required="NON_REQUIRED",
         field_domain=None
     )
-
+def create_ground_zone(input_folder):
+    ground_zone = cf(out_path=input_folder,
+        out_name="ground_zone",
+        geometry_type="POLYGON",
+        template=None,
+        has_m="ENABLED",
+        has_z="ENABLED",
+        spatial_reference=None
+    )
+    af(in_table=ground_zone, 
+        field_name="name", 
+        field_type="TEXT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=10,
+        field_alias="name",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=ground_zone, 
+        field_name="type", 
+        field_type="TEXT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=15,
+        field_alias="type",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+def create_tree_zone(input_folder):
+    tree_zone = cf(out_path=input_folder,
+        out_name="tree_zone",
+        geometry_type="POLYGON",
+        template=None,
+        has_m="ENABLED",
+        has_z="ENABLED",
+        spatial_reference=None
+    )
+    af(in_table=tree_zone, 
+        field_name="name", 
+        field_type="TEXT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=10,
+        field_alias="name",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=tree_zone, 
+        field_name="avg_hgt", 
+        field_type="DOUBLE",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="avg_hgt",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+def create_building_row(input_folder):
+    building_row = cf(out_path=input_folder,
+        out_name="building_row",
+        geometry_type="POLYLINE",
+        template=None,
+        has_m="ENABLED",
+        has_z="ENABLED",
+        spatial_reference=None
+    )
+    af(in_table=building_row, 
+        field_name="name", 
+        field_type="TEXT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=10,
+        field_alias="name",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=building_row, 
+        field_name="avg_hgt", 
+        field_type="DOUBLE",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="avg_hgt",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=building_row, 
+        field_name="bldg_pct", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="bldg_pct",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
 def main():
     create_receivers(input_folder)
     create_existing_roadway(input_folder)
@@ -710,6 +813,9 @@ def main():
     create_study_area(input_folder)
     create_study_receivers(input_folder)
     create_field_measurements(input_folder)
+    create_building_row(input_folder)
+    create_tree_zone(input_folder)
+    create_ground_zone(input_folder)
 
 if __name__ == '__main__':
     main()
