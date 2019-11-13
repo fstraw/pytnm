@@ -3,21 +3,36 @@ import os
 import arcpy
 from arcpy.da import SearchCursor
 
-from validation import validate_roadway_fields
+from .validation import validate_roadway_fields
 
-
-def write_header(f):
-    f.write("1,3\n")             
 
 def roadway_separator():
-    hdr = "'L' /\n"
-    return hdr
+    """Syntax for separating individual roadways in STAMINA format
+    
+    Returns:
+        [String] -- [roadway separator]
+    """
+    separator = "'L' /\n"
+    return separator
 
 def barrier_separator():
-    hdr = "'A' /\n"
-    return hdr
+    """Syntax for separating individual barriers in STAMINA format
+    
+    Returns:
+        [String] -- [barrier separator]
+    """
+    separator = "'A' /\n"
+    return separator
 
 def _write_roadway_points(line_geom):
+    """Converts Polyline to STAMINA syntax 
+    
+    Arguments:
+        line_geom {[arcpy.Polyline]} -- [polyline geometry]
+    
+    Returns:
+        [string] -- [roadway points]
+    """
     point_strings = ""
     point_strings += roadway_separator()
     for part in line_geom:
@@ -30,11 +45,13 @@ def _write_roadway_points(line_geom):
         return point_strings
 
 def _write_roadways(roadway_feature_class, condition):
-    """Creates string of roadway attributes
+    """Writes roadway feature class to STAMINA syntax
     
     Arguments:
         roads_feature_class {String} -- Path to feature class
         condition {String} -- Existing, NoBuild, or Build. Determines fields to use from geospatial template
+    Returns:
+        [string] -- [roadways]
     """
     flds = validate_roadway_fields(roadway_feature_class, condition.upper()) 
     roadway_count = len([row for row in SearchCursor(roadway_feature_class, "*")])
@@ -55,8 +72,16 @@ def _write_roadways(roadway_feature_class, condition):
         return roadway_string
 
 def _write_barrier_points(line_geom):
+    """Converts Polyline to STAMINA syntax
+    
+    Arguments:
+        line_geom {arcpy.Polyline]} -- [polyline geometry]
+    
+    Returns:
+        [String] -- [barrier points]
+    """
     point_strings = ""
-    # set constants for barrier defaults
+    # set constants for barrier defaults TODO: parameterize
     PERTURBATION_INCREMENT = 2 
     NUMBER_OF_PERTURBATIONS = 15    
     BARRIER_INITIAL_HEIGHT = 0
