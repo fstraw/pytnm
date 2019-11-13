@@ -136,6 +136,20 @@ def _write_receivers(receiver_feature_class):
         return receiver_string
 
 def write_stamina_file(file_path, condition, roadways=None, barriers=None, receivers=None):
+    """Creates STAMINA file from set of feature classes
+    
+    Arguments:
+        file_path {String} -- Path for output file
+        condition {String} -- EXISTING, NOBUILD, or BUILD (case-insensitive)
+    
+    Keyword Arguments:
+        roadways {String} -- Path to roadways feature class (default: {None})
+        barriers {String} -- Path to barriers feature class (default: {None})
+        receivers {String} -- Path to receivers feature class (default: {None})
+    
+    Returns:
+        [String] -- Path to output STAMINA file
+    """
     stamina_string = "1,3\n"
     if roadways:
         stamina_string += _write_roadways(roadways, condition)
