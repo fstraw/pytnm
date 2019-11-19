@@ -224,19 +224,19 @@ def append_tnm_traffic(wbname, ws='Traffic'):
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(__file__))
-    xlsx = r"C:\Users\brbatt\PyCharmProjects\pytnm\files\segment4.xlsx"
-    run_name = 'segment4'
-    dir_name = r'J:\55283blr\Doc\Noise\2019\GIS\DATA'
+    xlsx = r"C:\Users\brbatt\PyCharmProjects\pytnm\files\bar4-3.xlsx"
+    run_name = '4'
+    dir_name = r'C:\Users\brbatt\PyCharmProjects\pytnm\files'
     wbname = xlsx
     rdshp = os.path.join(dir_name, 'roads_{}'.format(run_name))
-    # barshp =os.path.join(dir_name, 'barriers_{}'.format(run_name))
-    # barsegshp = os.path.join(dir_name, 'exbars_{}'.format(run_name))
+    barshp = os.path.join(dir_name, 'barriers_{}'.format(run_name))
+    barsegshp = os.path.join(dir_name, 'exbars_{}'.format(run_name))
 
-    # barslist = barriers_to_list(wbname, ws='Barriers')
-    # bars_list_to_shape(barslist, barshp)
+    barslist = barriers_to_list(wbname, ws='Barriers')
+    bars_list_to_shape(barslist, barshp)
     traffic_dict = append_tnm_traffic(wbname, ws='Traffic')
     rdslist = rds_to_list(wbname, ws='Roads')
     rds_list_to_shape(rdslist, rdshp, traffic_dict)    
-    # barsegs = group_barrier_segments_by_height(wbname)
-    # bar_segs_list_to_shape(barsegs, barsegshp)
+    barsegs = group_barrier_segments_by_height(wbname)
+    bar_segs_list_to_shape(barsegs, barsegshp)
     # t = get_last_barrier_seg_pointid(wbname)

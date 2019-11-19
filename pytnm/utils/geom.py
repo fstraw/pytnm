@@ -57,7 +57,7 @@ def update_feature_z(fc, raster):
             if geom.type == "polyline":
                 array = _update_poly_z(geom, raster)           
                 new_geom = Polyline(array, fc_sr, True)
-            if geom.type == "polygon":
+            elif geom.type == "polygon":
                 array = _update_poly_z(geom, raster)           
                 new_geom = Polygon(array, fc_sr, True)
             elif geom.type == "point":
@@ -70,4 +70,6 @@ def update_feature_z(fc, raster):
             cursor.updateRow([new_geom])
 
 if __name__ == '__main__':
-    pass
+    fc = r"C:\Users\brbatt\Documents\!Noise\I85Widening\GIS\DATA\barrier.shp"
+    raster = r"C:\Users\brbatt\Downloads\elevation_NED10M_ga135_3768577_01\elevation\ned10m34083a8.tif"
+    update_feature_z(fc, raster)
