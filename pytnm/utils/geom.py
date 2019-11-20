@@ -17,15 +17,13 @@ def project_point(x, y, from_spatial_reference, to_spatial_reference):
     new_y = projected_point.Y
     return (new_x, new_y)
 
-def _get_z_value(coords, raster, z_factor=None):
+def _get_z_value(coords, raster):
     coords_string = "{} {}".format(*coords)
     eval_cell_value = GetCellValue_management(raster, coords_string)
     cell_value = float(eval_cell_value.getOutput(0))
-    if z_factor:
-        cell_value *= z_factor
     return round(cell_value, 1)
 
-def _update_poly_z(geom, raster):
+def _update_poly_z(geom, raster, z_factor=1):
     geom_sr = geom.spatialReference  
     desc_raster = Describe(raster)    
     raster_sr = desc_raster.spatialReference 
@@ -33,8 +31,8 @@ def _update_poly_z(geom, raster):
     for part in geom: # TODO: account for multipart geometry
         for pnt in part:
             projected_coords = project_point(pnt.X, pnt.Y, geom_sr, raster_sr)
-            new_z = _get_z_value(projected_coords, raster)
-            pnt.Z = new_z                  
+            new_z = round(_get_z_value(projected_coords, raster) * z_factor, 1)
+            pnt.Z = new_z
             array.add(pnt)
     return array
 
@@ -48,7 +46,7 @@ def _update_point_z(geom, raster):
     pnt.Z = new_z                  
     return pnt
 
-def update_feature_z(fc, raster):
+def update_feature_z(fc, raster, z_factor=1):
     desc_fc = Describe(fc)
     fc_sr = desc_fc.spatialReference
     with UpdateCursor(fc, ["SHAPE@"]) as cursor:
