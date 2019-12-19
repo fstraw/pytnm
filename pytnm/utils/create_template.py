@@ -551,6 +551,39 @@ def create_barrier(input_folder):
         field_is_required="NON_REQUIRED",
         field_domain=None
     )
+    af(in_table=barrier, 
+        field_name="pert_inc", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="pert_inc",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=barrier, 
+        field_name="pert_num", 
+        field_type="SHORT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="pert_num",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=barrier, 
+        field_name="init_hgt", 
+        field_type="DOUBLE",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="init_hgt",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
 def create_terrain_line(input_folder):
     terrain_line = cf(out_path=input_folder,
         out_name="terrain_line",

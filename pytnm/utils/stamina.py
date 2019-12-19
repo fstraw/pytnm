@@ -126,12 +126,12 @@ def _write_receivers(receiver_feature_class):
     receiver_string += "RECEIVERS\n"
     with SearchCursor(receiver_feature_class, ["rec_id", "bldg_hgt", "SHAPE@X", "SHAPE@Y", "SHAPE@Z"]) as cursor:
         for row in cursor:            
-            rec_id = row[0]
+            rec_id = row[0] # TODO: if no rec id, .dat file does not import properly into TNM 
             bldg_hgt = row[1]            
             x = round(row[2], 1)
             y = round(row[3], 1)
-            z = round(row[4], 1) + bldg_hgt
-            receiver_string += "{} {} {} {}\n".format(rec_id, x, y, z)
+            z = round(row[4] * 3.2808399, 1) + bldg_hgt
+            receiver_string += "'{}' {} {} {}\n".format(rec_id, x, y, z)
         return receiver_string
 
 def write_stamina_file(file_path, condition, roadways=None, barriers=None, receivers=None):
@@ -162,8 +162,9 @@ def write_stamina_file(file_path, condition, roadways=None, barriers=None, recei
     return file_path
 
 if __name__ == '__main__':
-    fp = r"C:\Users\brbatt\Documents\!Noise\I85Widening\GIS"
-    condition = "Build"
-    barriers = r"C:\Users\brbatt\Documents\!Noise\I85Widening\GIS\DATA\barrier.shp"
-    receivers = r"C:\Users\brbatt\Documents\!Noise\I85Widening\GIS\DATA\receiver.shp"
-    write_stamina_file(fp, condition, roadways=None, barriers=barriers, receivers=receivers)
+    file_path = r"C:\TNM25\US98"
+    condition = "Existing"
+    barriers = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\barrier.shp"
+    receivers = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\receiver.shp"
+    roadways = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\existing_roadway.shp"
+    write_stamina_file(file_path, condition, roadways=None, barriers=barriers, receivers=receivers)
