@@ -70,7 +70,7 @@ def _write_roadways(roadway_feature_class, condition):
             roadway_string += _write_roadway_points(geometry)
         return roadway_string
 
-def _write_barrier_points(line_geom):
+def _write_barrier_points(line_geom, barrier_info=None):
     """Converts Polyline to STAMINA syntax
     
     Arguments:
@@ -84,6 +84,10 @@ def _write_barrier_points(line_geom):
     PERTURBATION_INCREMENT = 2 
     NUMBER_OF_PERTURBATIONS = 15    
     BARRIER_INITIAL_HEIGHT = 0
+    if barrier_info:
+        PERTURBATION_INCREMENT = barrier_info["pert_inc"]
+        NUMBER_OF_PERTURBATIONS = barrier_info["pert_num"]    
+        BARRIER_INITIAL_HEIGHT = barrier_info["init_hgt"]
     for part in line_geom:
         for pnt_number, pnt in enumerate(part):
             x = round(pnt.X, 1)
@@ -105,13 +109,18 @@ def _write_barriers(barrier_feature_class):
         barrier_feature_class {String} -- Path to feature class        
     """
     barrier_count = len([row for row in SearchCursor(barrier_feature_class, "*")])
-    with SearchCursor(barrier_feature_class, ("name", "SHAPE@")) as cursor:
+    with SearchCursor(barrier_feature_class, ("name", "SHAPE@", "pert_inc", "pert_num", "init_hgt")) as cursor:
         barrier_string = "3,{}\n".format(barrier_count)
         for row in cursor:
+            barrier_info = {
+                "pert_inc": row[2],
+                "pert_num": row[3],
+                "init_hgt": row[4]
+                }
             name = row[0]
             geometry = row[1]
             barrier_string += "{}\n".format(name)
-            barrier_string += _write_barrier_points(geometry)
+            barrier_string += _write_barrier_points(geometry, barrier_info)
         return barrier_string
 
 def _write_receivers(receiver_feature_class):
@@ -124,13 +133,14 @@ def _write_receivers(receiver_feature_class):
     receiver_count = len([row for row in SearchCursor(receiver_feature_class, "*")])
     receiver_string = "5,{}\n".format(receiver_count)
     receiver_string += "RECEIVERS\n"
-    with SearchCursor(receiver_feature_class, ["rec_id", "bldg_hgt", "SHAPE@X", "SHAPE@Y", "SHAPE@Z"]) as cursor:
-        for row in cursor:            
+    flds = ["rec_id", "bldg_hgt", "SHAPE@X", "SHAPE@Y", "SHAPE@Z", "Id"]
+    with SearchCursor(receiver_feature_class, flds) as cursor:
+        for row in sorted(cursor, key=lambda row: row[flds.index("Id")]): # sort by Id in shapefile          
             rec_id = row[0] # TODO: if no rec id, .dat file does not import properly into TNM 
             bldg_hgt = row[1]            
             x = round(row[2], 1)
             y = round(row[3], 1)
-            z = round(row[4] * 3.2808399, 1) + bldg_hgt
+            z = round(row[4], 1) + bldg_hgt
             receiver_string += "'{}' {} {} {}\n".format(rec_id, x, y, z)
         return receiver_string
 
@@ -167,4 +177,4 @@ if __name__ == '__main__':
     barriers = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\barrier.shp"
     receivers = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\receiver.shp"
     roadways = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\existing_roadway.shp"
-    write_stamina_file(file_path, condition, roadways=None, barriers=barriers, receivers=receivers)
+    write_stamina_file(file_path, condition, roadways=roadways, barriers=barriers, receivers=receivers)
