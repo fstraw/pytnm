@@ -223,6 +223,17 @@ def create_receivers(input_folder):
         field_is_required="NON_REQUIRED",
         field_domain=None
     )
+    af(in_table=receivers, 
+        field_name="bar_reduct", 
+        field_type="DOUBLE",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="bar_reduct",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
 
 def create_existing_roadway(input_folder):
     existing_roadways = cf(out_path=input_folder,
