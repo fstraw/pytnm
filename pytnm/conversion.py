@@ -61,7 +61,4 @@ def tnm_rds_to_fc(fc_list, output):
     w.save(output)
 
 if __name__ == '__main__':
-    xlsx = r"C:\Users\brbatt\PyCharmProjects\pytnm\files\segment1.xlsx"
-    x = _xlsx_to_traffic(xlsx)   
-    t = xlsx_to_list(xlsx)
-    l = tnm_rds_to_fc(t, r'J:\55283blr\Doc\Noise\2019\GIS\DATA\segment1')
+    pass

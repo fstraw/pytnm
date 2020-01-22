@@ -2,7 +2,7 @@ import os
 import arcpy
 from arcpy.da import SearchCursor
 
-from validation import validate_roadway_fields
+from .validation import validate_roadway_fields
 
 
 def roadway_separator():
@@ -172,9 +172,4 @@ def write_stamina_file(file_path, condition, roadways=None, barriers=None, recei
     return file_path
 
 if __name__ == '__main__':
-    file_path = r"C:\TNM25\US98"
-    condition = "Existing"
-    barriers = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\barrier.shp"
-    receivers = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\receiver.shp"
-    roadways = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\existing_roadway.shp"
-    write_stamina_file(file_path, condition, roadways=roadways, barriers=barriers, receivers=receivers)
+    pass

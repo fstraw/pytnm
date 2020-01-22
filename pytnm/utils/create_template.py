@@ -4,7 +4,6 @@ from arcpy import AddField_management as af
 from arcpy import env
 
 env.overwriteOutput = True
-input_folder = r"C:\Users\brbatt\PyCharmProjects\pytnm\gis\DATA"
 
 def create_receivers(input_folder):
     receivers = cf(out_path=input_folder,
@@ -837,18 +836,6 @@ def create_building_row(input_folder):
         field_is_required="NON_REQUIRED",
         field_domain=None
     )
-def main():
-    create_receivers(input_folder)
-    create_existing_roadway(input_folder)
-    create_proposed_roadway(input_folder)
-    create_barrier(input_folder)
-    create_terrain_line(input_folder)
-    create_study_area(input_folder)
-    create_study_receivers(input_folder)
-    create_field_measurements(input_folder)
-    create_building_row(input_folder)
-    create_tree_zone(input_folder)
-    create_ground_zone(input_folder)
 
 if __name__ == '__main__':
-    main()
+    pass
