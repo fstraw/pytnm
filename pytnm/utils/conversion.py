@@ -168,12 +168,12 @@ def rds_list_to_shape(rdslist, outputshp, traf_dict=None):
         if not traf_dict:
             w.record(rd[0], int(rd[1]), 0, 0, 0, 0, 0, 0)
         else:
-            auto = traffic_dict[rd[0]][0]
-            medium = traffic_dict[rd[0]][1]
-            heavy = traffic_dict[rd[0]][2]
-            medpct = traffic_dict[rd[0]][3]
-            hvypct = traffic_dict[rd[0]][4]
-            speed = traffic_dict[rd[0]][5]
+            auto = traf_dict[rd[0]][0]
+            medium = traf_dict[rd[0]][1]
+            heavy = traf_dict[rd[0]][2]
+            medpct = traf_dict[rd[0]][3]
+            hvypct = traf_dict[rd[0]][4]
+            speed = traf_dict[rd[0]][5]
             w.record(rd[0], int(rd[1]), auto, medium, heavy, medpct, hvypct, speed)
     w.save(outputshp)
     return outputshp
