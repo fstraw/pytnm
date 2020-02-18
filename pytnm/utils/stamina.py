@@ -56,7 +56,7 @@ def _write_roadways(roadway_feature_class, condition):
     roadway_count = len([row for row in SearchCursor(roadway_feature_class, "*")])
     with SearchCursor(roadway_feature_class, flds) as cursor:
         roadway_string = "2,{}\n".format(roadway_count)
-        for row in cursor:
+        for row in sorted(cursor, key=lambda row: row[flds.index("road_name")]):
             road = row[0]
             speed = row[1]
             auto = round(row[2], 0)
