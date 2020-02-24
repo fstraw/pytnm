@@ -37,6 +37,42 @@ class Report(object):
             else:    
                 return [record for record in sreader.records()]
 
+    def nac_b_receivers(self):
+        nac_cat = self._field_map()['nac_cat']                       
+        return [record for record in self.all_receivers() if record[nac_cat] == 'B']
+
+    def nac_c_receivers(self):
+        nac_cat = self._field_map()['nac_cat']                       
+        return [record for record in self.all_receivers() if record[nac_cat] == 'C']
+
+    def nac_d_receivers(self):
+        nac_cat = self._field_map()['nac_cat']                       
+        return [record for record in self.all_receivers() if record[nac_cat] == 'D']
+
+    def nac_e_receivers(self):
+        nac_cat = self._field_map()['nac_cat']                       
+        return [record for record in self.all_receivers() if record[nac_cat] == 'E']
+
+    def nac_b_receptors_total(self):
+        du = self._field_map()['du']
+        nac_cat = self._field_map()['nac_cat']                       
+        return sum([row[du] for row in self.all_receivers() if row[nac_cat] == 'B'])
+
+    def nac_c_receptors_total(self):
+        du = self._field_map()['du']
+        nac_cat = self._field_map()['nac_cat']                       
+        return sum([row[du] for row in self.all_receivers() if row[nac_cat] == 'C'])
+
+    def nac_d_receptors_total(self):
+        du = self._field_map()['du']
+        nac_cat = self._field_map()['nac_cat']                       
+        return sum([row[du] for row in self.all_receivers() if row[nac_cat] == 'D'])
+
+    def nac_e_receptors_total(self):
+        du = self._field_map()['du']
+        nac_cat = self._field_map()['nac_cat']                       
+        return sum([row[du] for row in self.all_receivers() if row[nac_cat] == 'E'])
+
     def sensitive_receivers(self):
         nac_cat = self._field_map()['nac_cat']                       
         return [record for record in self.all_receivers() if record[nac_cat] in self.SENSITIVE_QUERY]
@@ -73,6 +109,26 @@ class Report(object):
     def impacted_total(self):
         du = self._field_map()['du']
         return sum([impact[du] for impact in self.impacted_receivers()])
+
+    def build_b_impacted_total(self):
+        nac_cat = self._field_map()['nac_cat']
+        du = self._field_map()['du']
+        return sum([impact[du] for impact in self.impacted_receivers() if impact[nac_cat] == 'B'])
+
+    def build_c_impacted_total(self):
+        nac_cat = self._field_map()['nac_cat']
+        du = self._field_map()['du']
+        return sum([impact[du] for impact in self.impacted_receivers() if impact[nac_cat] == 'C'])
+
+    def build_d_impacted_total(self):
+        nac_cat = self._field_map()['nac_cat']
+        du = self._field_map()['du']
+        return sum([impact[du] for impact in self.impacted_receivers() if impact[nac_cat] == 'D'])
+
+    def build_e_impacted_total(self):
+        nac_cat = self._field_map()['nac_cat']
+        du = self._field_map()['du']
+        return sum([impact[du] for impact in self.impacted_receivers() if impact[nac_cat] == 'E'])
 
     def build_b_nac_impacts(self):        
         nac_cat = self._field_map()['nac_cat']
@@ -142,23 +198,33 @@ class Report(object):
         bld_snd = self._field_map()['bld_snd']
         return max([row[bld_snd] for row in self.sensitive_receivers()])
     
-    def average_change(self):
+    def bld_average_change(self):
         ex_snd = self._field_map()['ex_snd']
         bld_snd = self._field_map()['bld_snd']
         diff_list = [row[bld_snd] - row[ex_snd] for row in self.sensitive_receivers()]
         return round(sum(diff_list) / len(diff_list), 1)
 
+    def nobld_average_change(self):
+        ex_snd = self._field_map()['ex_snd']
+        nobld_snd = self._field_map()['nobld_snd']
+        diff_list = [row[nobld_snd] - row[ex_snd] for row in self.sensitive_receivers()]
+        return round(sum(diff_list) / len(diff_list), 1)
+
     def summary(self):
-        narrative = f"A total of {self.sensitive_receptors_total()} noise sensitive receptors were analyzed.\n"
-        narrative += f" Existing noise levels range from {self.existing_minimum()} to {self.existing_maximum()} dBA at {self.sensitive_receptors_total()} receptors.\n"
-        narrative += f" No Build noise levels would range from {self.nobld_minimum()} to {self.nobld_maximum()} dBA.\n"
-        narrative += f" Build noise levels would range from {self.bld_minimum()} to {self.bld_maximum()} dBA.\n"
-        narrative += f" Noise is predicted to change by an average of {self.average_change()} dBA under the Build Alternative.\n"
-        narrative += f" A total of {self.impacted_total()} receptors would be impacted under the Build Alternative."
+        narrative = f"A total of {self.sensitive_receptors_total()} noise sensitive receptors were analyzed. "
+        narrative += f"Existing noise levels range from {self.existing_minimum()} to {self.existing_maximum()} dBA at {self.sensitive_receptors_total()} receptors. "
+        narrative += f"No Build noise levels would range from {self.nobld_minimum()} to {self.nobld_maximum()} dBA. "
+        narrative += f"Build noise levels would range from {self.bld_minimum()} to {self.bld_maximum()} dBA. "        
+        narrative += f"Noise is predicted to change by an average of {self.nobld_average_change()} dBA under the No Build Alternative. "
+        narrative += f"Noise is predicted to change by an average of {self.bld_average_change()} dBA under the Build Alternative. "
+        if self.impacted_total() == 0:
+            narrative += f"No receptors would be impacted under the Build Alternative."
+        else:
+            narrative += f"A total of {self.impacted_total()} receptors would be impacted under the Build Alternative."
         return narrative
 
 
-def create_florida_barrier_summary_table(xlsx, bar_length, cost_per_sq_ft):
+def create_florida_barrier_summary(xlsx, bar_length, cost_per_sq_ft):
     """ Generate Florida barrier summary based on Sound Results table for *each* barrier
     analysis in TNM Run. 
     
@@ -188,14 +254,48 @@ def create_florida_barrier_summary_table(xlsx, bar_length, cost_per_sq_ft):
         benefited_receptor_count = sum([row[3] for row in benefited_receptors])
         impacted_benefited_receptor_count = sum([row[3] for row in impacted_receptors if row[11] >= 5])
         impacted_not_benefited_receptor_count = benefited_receptor_count - impacted_benefited_receptor_count
-        average_benefit_reduction = round(sum([row[11] for row in benefited_receptors]) / len(benefited_receptors), 1)
         estimated_cost = round(bar_length * bar_hgt * cost_per_sq_ft)
-        cost_per_benefit = round(estimated_cost / benefited_receptor_count)
+        try:
+            average_benefit_reduction = round(sum([row[11] for row in benefited_receptors]) / len(benefited_receptors), 1)
+            cost_per_benefit = round(estimated_cost / benefited_receptor_count)
+        except ZeroDivisionError:
+            average_benefit_reduction = 0        
+            cost_per_benefit = 0
         barrier_summary.append((
             bar_hgt, '{:,.0f}'.format(bar_length), impacted_receptors_count, min_benefit, mid_benefit, max_benefit, 
             impacted_benefited_receptor_count, impacted_not_benefited_receptor_count, benefited_receptor_count, 
             average_benefit_reduction, estimated_cost, cost_per_benefit))
     return barrier_summary
+
+def summarize_cne(receivers, cne):
+    r = Report(receivers, cne)    
+    return (
+        cne, 
+        'LOCATION', 
+        r.nac_b_receptors_total(), 
+        r.nac_c_receptors_total(),
+        r.nac_e_receptors_total(),
+        r.existing_minimum(),
+        r.existing_maximum(),
+        r.nobld_minimum(),
+        r.nobld_maximum(),
+        r.bld_minimum(),
+        r.bld_maximum(),
+        r.build_b_impacted_total(),
+        r.build_c_impacted_total(),
+        r.build_e_impacted_total(),
+        'WARRANTED'
+    )
+
+def create_cne_summary_table(receivers, cne_list, xlsx):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    hdrs = ('CNE', 'Location', 'NAC B', 'NAC C', 'NAC E', 'Min', 'Max', 'Min', 'Max', 'Min', 'Max', 'NAC B', 'NAC C', 'NAC E', 'Abatement Warranted')
+    ws.append(hdrs)
+    for cne in cne_list:
+        cne_summary = summarize_cne(receivers, cne)
+        ws.append(cne_summary)    
+    wb.save(filename=xlsx)
 
 def create_barrier_summary_table(barrier_summary, xlsx):
     """Generate .xlsx file of barrier results
