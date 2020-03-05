@@ -7,10 +7,7 @@ class Analysis(object):
     pass
 
 class Report(object):
-    """[summary]
-
-    Arguments:
-        object {[type]} -- [description]
+    """ Reports receiver results based on shapefile of known schema
     """       
 
     def __init__(self, receivers, common_noise_environment=None):
@@ -212,11 +209,11 @@ class Report(object):
 
     def summary(self):
         narrative = f"A total of {self.sensitive_receptors_total()} noise sensitive receptors were analyzed. "
-        narrative += f"Existing noise levels range from {self.existing_minimum()} to {self.existing_maximum()} dBA at {self.sensitive_receptors_total()} receptors. "
-        narrative += f"No Build noise levels would range from {self.nobld_minimum()} to {self.nobld_maximum()} dBA. "
-        narrative += f"Build noise levels would range from {self.bld_minimum()} to {self.bld_maximum()} dBA. "        
-        narrative += f"Noise is predicted to change by an average of {self.nobld_average_change()} dBA under the No Build Alternative. "
-        narrative += f"Noise is predicted to change by an average of {self.bld_average_change()} dBA under the Build Alternative. "
+        narrative += f"Existing noise levels range from {self.existing_minimum()} to {self.existing_maximum()} dB(A) at {self.sensitive_receptors_total()} receptors. "
+        narrative += f"No Build noise levels would range from {self.nobld_minimum()} to {self.nobld_maximum()} dB(A). "
+        narrative += f"Build noise levels would range from {self.bld_minimum()} to {self.bld_maximum()} dB(A). "        
+        narrative += f"Noise is predicted to change by an average of {self.nobld_average_change()} dB(A) under the No Build Alternative. "
+        narrative += f"Noise is predicted to change by an average of {self.bld_average_change()} dB(A) under the Build Alternative. "
         if self.impacted_total() == 0:
             narrative += f"No receptors would be impacted under the Build Alternative."
         else:
@@ -307,7 +304,7 @@ def create_barrier_summary_table(barrier_summary, xlsx):
     wb = openpyxl.Workbook()
     ws = wb.active
     hdrs = ("Barrier Height", "Barrier Length", "Impacted Receptors", 
-    "5 - 5.9 dBA", "6 - 6.9 dBA", "7+", "Impacted", "Not Impacted", 
+    "5 - 5.9 dB(A)", "6 - 6.9 dB(A)", "7+", "Impacted", "Not Impacted", 
     "Total", "Average Benefited Reduction", "Estimated Cost", "Cost per Benefit", "Feasible and Reasonable")
     ws.append(hdrs)
     for barrier_design in barrier_summary:
