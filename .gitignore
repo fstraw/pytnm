@@ -43,3 +43,14 @@ scbar.py
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# gis
+**/*.gdb
+*.tbx
+/gis/Index
+*.pyt.xml
+
+#general
+.vscode
+.pytest_cache/
+env/
