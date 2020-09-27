@@ -217,7 +217,7 @@ class Report(object):
         if self.impacted_total() == 0:
             narrative += f"No receptors would be impacted under the Build Alternative."
         else:
-            narrative += f"A total of {self.impacted_total()} receptors would be impacted under the Build Alternative."
+            narrative += f"A total of {self.impacted_total()} receptors would be impacted under the Build Alternative; therefore, noise abatement was considered."
         return narrative
 
 

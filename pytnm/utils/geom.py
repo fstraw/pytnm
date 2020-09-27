@@ -6,7 +6,7 @@ from arcpy import Polyline
 from arcpy import Polygon
 from arcpy import Point
 from arcpy import PointGeometry
-from arcpy.da import UpdateCursor
+from arcpy.da import SearchCursor, UpdateCursor
 
 
 def project_point(x, y, from_spatial_reference, to_spatial_reference):
@@ -40,6 +40,32 @@ def _update_poly_z(geom, raster, z_factor=1):
             array.add(pnt)
     return array
 
+def _round_poly_vertices(geom):
+    array = Array()
+    for part in geom: # TODO: account for multipart geometry
+        for pnt in part:
+            pnt.X = round(pnt.X, 2)
+            pnt.Y = round(pnt.Y, 2)
+            pnt.Z = round(pnt.Z, 2)
+            array.add(pnt)                    
+    return array
+
+def _update_z_poly_vertices(geom, xys_to_update):
+    """Updates z vales for given coordinate lists, for making z values congruent for identical xy locations
+    """
+    array = Array()
+    for part in geom: # TODO: account for multipart geometry
+        for pnt in part:
+            for xyz in xys_to_update:
+                if pnt.X == xyz[0] and pnt.Y == xyz[1]: 
+                    pnt.X = xyz[0]
+                    pnt.Y = xyz[1]
+                    pnt.Z = xyz[2]
+                else:
+                    pass
+            array.add(pnt)                    
+    return array
+
 def _update_point_z(geom, raster, z_factor=1):
     geom_sr = geom.spatialReference  
     desc_raster = Describe(raster)    
@@ -71,8 +97,69 @@ def update_feature_z(fc, raster, z_factor=1, sql=None):
                     print(exc)
             cursor.updateRow([new_geom])
 
+def round_coordinates(shp):
+    with UpdateCursor(shp, 'SHAPE@') as ucursor:        
+        for row in ucursor:
+            geom = row[0]
+            array = _round_poly_vertices(geom)
+            new_geom = Polyline(array, None, True)
+            ucursor.updateRow([new_geom])
+
+def update_max_z(shp, xys_to_update):
+    """Updates z vales for given coordinate lists, for making z values congurent for identical xy locations
+
+    Args:
+        shp ([type]): [description]
+    """
+    with UpdateCursor(shp, 'SHAPE@') as ucursor:        
+        for row in ucursor:
+            geom = row[0]
+            array = _update_z_poly_vertices(geom, xys_to_update)
+            new_geom = Polyline(array, None, True)
+            ucursor.updateRow([new_geom])
+
+def get_all_vertices(shp):
+    vertices = []
+    with SearchCursor(shp, 'SHAPE@') as scursor:
+        for row in scursor:
+            geom = row[0]
+            for part in geom:
+                for pnt in part:
+                    xyz = [pnt.X, pnt.Y, pnt.Z]
+                    vertices.append(xyz)
+    return vertices
+
+def identical_pnts(coords):
+    identical_pnts = []
+    for point in coords:
+        identical = 0
+        x = round(point[0], 2)
+        y = round(point[1], 2)
+        for pnt in coords:
+            if round(pnt[0], 2) == x and round(pnt[1], 2) == y:
+                identical += 1 # all points should be identical to themselves, so one will be minimum
+        if identical > 1:
+            identical_pnts.append(point)
+    return sorted(identical_pnts)
+
+def identical_set(coords): #produces duplicates but whatever
+    """Returns set of max z values per given identical xy
+
+    Args:
+        coords (List): List of identical xy coordinates
+    """
+    max_coords = []
+    for coord in coords:
+        identicals = [xy for xy in coords if xy[0] == coord[0] and xy[1] == coord[1]]
+        max_z = max([xyz[2] for xyz in identicals])
+        for identical in identicals:
+            if identical[2] == max_z:
+                max_coords.append(identical)
+                break
+            else:
+                pass
+    return max_coords 
+
+
 if __name__ == '__main__':
-    fc = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\barrier.shp"
-    raster = r"C:\Users\brbatt\Documents\!Noise\US98\GIS\DATA\ned_existing_3m.tif"
-    sql = """ name <> 'SIDEBAR' """
-    update_feature_z(fc, raster, z_factor=3.2808399, sql=sql)
+    pass
