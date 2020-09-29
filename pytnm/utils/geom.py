@@ -50,6 +50,25 @@ def _round_poly_vertices(geom):
             array.add(pnt)                    
     return array
 
+def _convert_z_vertices(geom, z_factor):
+    """Converts z-coordinates to different unit
+
+    Args:
+        geom ([type]): [description]
+        z_factor ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    array = Array()
+    for part in geom: # TODO: account for multipart geometry
+        for pnt in part:
+            pnt.X = pnt.X
+            pnt.Y = pnt.Y
+            pnt.Z = pnt.Z * z_factor
+            array.add(pnt)                    
+    return array
+
 def _update_z_poly_vertices(geom, xys_to_update):
     """Updates z vales for given coordinate lists, for making z values congruent for identical xy locations
     """
@@ -102,6 +121,14 @@ def round_coordinates(shp):
         for row in ucursor:
             geom = row[0]
             array = _round_poly_vertices(geom)
+            new_geom = Polyline(array, None, True)
+            ucursor.updateRow([new_geom])
+
+def convert_z_coords(shp, z_factor=3.2808399):
+    with UpdateCursor(shp, 'SHAPE@') as ucursor:        
+        for row in ucursor:
+            geom = row[0]
+            array = _convert_z_vertices(geom, z_factor)
             new_geom = Polyline(array, None, True)
             ucursor.updateRow([new_geom])
 
@@ -162,4 +189,4 @@ def identical_set(coords): #produces duplicates but whatever
 
 
 if __name__ == '__main__':
-    pass
+    convert_z_coords(r"C:\Users\brbatt\Documents\!Noise\2001172_I65Wabash\GIS\DATA\terrain_line.shp")
