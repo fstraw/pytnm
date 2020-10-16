@@ -234,6 +234,17 @@ def create_receivers(input_folder):
         field_is_required="NON_REQUIRED",
         field_domain=None
     )
+    af(in_table=receivers, 
+        field_name="project", 
+        field_type="TEXT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=10,
+        field_alias="project",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
 
 def create_existing_roadway(input_folder):
     existing_roadways = cf(out_path=input_folder,
@@ -750,6 +761,28 @@ def create_field_measurements(input_folder):
         field_scale=None, 
         field_length=None,
         field_alias="z",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=receivers, 
+        field_name="dba", 
+        field_type="DOUBLE",
+        field_precision=None,
+        field_scale=None, 
+        field_length=None,
+        field_alias="dba",
+        field_is_nullable="NULLABLE",
+        field_is_required="NON_REQUIRED",
+        field_domain=None
+    )
+    af(in_table=receivers, 
+        field_name="project", 
+        field_type="TEXT",
+        field_precision=None,
+        field_scale=None, 
+        field_length=10,
+        field_alias="project",
         field_is_nullable="NULLABLE",
         field_is_required="NON_REQUIRED",
         field_domain=None
