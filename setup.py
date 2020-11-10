@@ -7,7 +7,7 @@ config = {
 	'description': 'FHWA\'s TNM 2.5 Toolkit',
 	'author': 'Brandon Batt',		
 	'author_email': 'brbatt@gmail.com',
-	'version': '0.5',
+	'version': '0.5.1',
 	'install_requires': ['openpyxl'],
 	'tests_require': ['pytest'],
 	'packages': ['pytnm'],

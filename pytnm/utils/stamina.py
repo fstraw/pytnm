@@ -109,9 +109,10 @@ def _write_barriers(barrier_feature_class):
         barrier_feature_class {String} -- Path to feature class        
     """
     barrier_count = len([row for row in SearchCursor(barrier_feature_class, "*")])
-    with SearchCursor(barrier_feature_class, ("name", "SHAPE@", "pert_inc", "pert_num", "init_hgt")) as cursor:
+    flds = ("name", "SHAPE@", "pert_inc", "pert_num", "init_hgt", "Id")
+    with SearchCursor(barrier_feature_class, flds) as cursor:
         barrier_string = "3,{}\n".format(barrier_count)
-        for row in cursor:
+        for row in sorted(cursor, key=lambda row: row[flds.index("Id")]): # sort by Id in shapefile 
             barrier_info = {
                 "pert_inc": row[2],
                 "pert_num": row[3],
