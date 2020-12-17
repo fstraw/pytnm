@@ -1,13 +1,12 @@
 import os
 from pyproj import CRS, Transformer
-# from arcpy import Array
-# from arcpy import Describe
-# from arcpy import GetCellValue_management
-# from arcpy import Polyline
-# from arcpy import Polygon
-# from arcpy import Point
-# from arcpy import PointGeometry
-# from arcpy.da import SearchCursor, UpdateCursor
+from arcpy import Array
+from arcpy import Describe
+from arcpy import GetCellValue_management
+from arcpy import Polyline
+from arcpy import Polygon
+from arcpy import Point
+from arcpy.da import SearchCursor, UpdateCursor
 
 
 def project_point(x, y, from_spatial_reference, to_spatial_reference):
