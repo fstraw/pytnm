@@ -71,6 +71,17 @@ def _write_roadway_points(line_geom):
 #             roadway_string += _write_roadway_points(geometry)
 #         return roadway_string
 
+def validate_roadway_field(condition):
+    if condition == "BUILD":
+        return ("auto_bld", "medium_bld", "heavy_bld")
+    elif condition == "EXISTING":
+        return ("auto_ex", "medium_ex", "heavy_ex")
+    elif condition == "NO_BUILD":
+        return ("auto_nb", "medium_nb", "heavy_nb")
+    else:
+        raise ValueError("Feature class must include fields: bld_total, ex_total, nb_total")
+
+
 def _write_roadways(roadway_feature_class, condition):
     """Writes roadway feature class to STAMINA syntax
     
@@ -82,10 +93,24 @@ def _write_roadways(roadway_feature_class, condition):
     """
 
     roadway_count = len([row for row in shapefile.Reader(roadway_feature_class)])
-    print(roadway_count)
     with shapefile.Reader(roadway_feature_class) as roadways:
-        for record in roadways.shapeRecords():
-            print(record.record[1:3])
+        roadway_string = "2,{}\n".format(roadway_count)
+        flds = validate_roadway_field(condition)
+        for row in roadways.shapeRecords():
+            print(row.shape)
+            road = row.record["road_name"]
+            speed = row.record["speed"]
+            auto = round(row.record[flds[0]], 0)
+            medium = round(row.record[flds[1]], 0)
+            heavy = round(row.record[flds[2]], 0)
+            geometry = row.shape
+            roadway_string += "{}\n".format(road)
+            roadway_string += "CARS {} {}\n".format(auto, speed)
+            roadway_string += "MT {} {}\n".format(medium, speed)
+            roadway_string += "HT {} {}\n".format(heavy, speed)
+            # roadway_string += _write_roadway_points(geometry)
+        return roadway_string
+ 
 
 
 #     flds = validate_roadway_fields(roadway_feature_class, condition.upper()) 
@@ -210,4 +235,4 @@ def _write_barrier_points(line_geom, barrier_info=None):
 #     return file_path
 
 if __name__ == '__main__':
-    _write_roadways(r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\existing_roadway.shp", "EXISTING")
+    print(_write_roadways(r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\existing_roadway.shp", "EXISTING"))
