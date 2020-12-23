@@ -1,5 +1,5 @@
 import os
-import shapefile
+import shapefile2
 # from arcpy import CreateFeatureclass_management as cf
 # from arcpy import AddField_management as af
 # from arcpy import env
@@ -21,12 +21,31 @@ import shapefile
 # POLYGONM = 25
 # MULTIPOINTM = 28
 # MULTIPATCH = 31
-
+    
 def create_receivers(input_folder):
     f = "receiver"
-    writer = shapefile.Writer(os.path.join(input_folder, f), shapeType=shapefile.POINTZ)
+    writer = shapefile2.Writer(os.path.join(input_folder, f), shapeType=shapefile2.POINTZ)
     writer.field("rec_id", "C", size=10)
-    writer.close()
+    writer.field("x", "N")
+    writer.field("y", "N")
+    writer.field("z", "N")
+    writer.field("du", "N")
+    writer.field("bldg_hgt", "N")
+    writer.field("land_use", "C", size=100)
+    writer.field("nac_cat", "C", size=1)
+    writer.field("nac_lvl", "N")
+    writer.field("ext_use", "C", size=1)
+    writer.field("displace", "C", size=1)
+    writer.field("bldg_row", "N")
+    writer.field("exist_snd", "N")
+    writer.field("nobld_snd", "N")
+    writer.field("bld_snd", "N")
+    writer.field("ex_imp", "C", size=1)
+    writer.field("nobld_imp", "C", size=1)
+    writer.field("bld_imp", "C", size=1)
+    writer.field("bar_name", "C", size=10)
+    writer.field("bar_reduct", "N")
+    writer.field("project", "C", size=25)
 
 
 # def create_receivers(input_folder):
