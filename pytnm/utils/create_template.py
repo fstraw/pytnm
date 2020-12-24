@@ -47,181 +47,40 @@ def create_receivers(input_folder):
     writer.field("bar_reduct", "N")
     writer.field("project", "C", size=25)
 
+def create_existing_roadway(input_folder):
+    f = "existing_roadway"
+    writer = shapefile2.Writer(os.path.join(input_folder, f), shapeType=shapefile2.POLYLINEZ)
+    writer.field("road_name", "C", size=32)
+    writer.field("exist_traf", "N")
+    writer.field("nobld_traf", "N")
+    writer.field("div_lanes", "N")
+    writer.field("speed", "N")
+    writer.field("ex_total", "N")
+    writer.field("nb_total", "N")
+    writer.field("auto_ex", "N")
+    writer.field("med_ex", "N")
+    writer.field("heavy_ex", "N")
+    writer.field("auto_nobld", "N")
+    writer.field("med_nobld", "N")
+    writer.field("heavy_nobld", "N")
+    writer.field("heavy_pct", "N")
+    writer.field("medium_pct", "N")
+    writer.field("project", "C", size=100)
 
-# def create_existing_roadway(input_folder):
-#     existing_roadways = cf(out_path=input_folder,
-#         out_name="existing_roadway",
-#         geometry_type="POLYLINE",
-#         template=None,
-#         has_m="ENABLED",
-#         has_z="ENABLED",
-#         spatial_reference=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="road_name", 
-#         field_type="TEXT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=32,
-#         field_alias="road_name",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="exist_traf", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="exist_traf",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="nobld_traf", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="nobld_traf",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="div_lanes", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="div_lanes",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="speed", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="speed",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="ex_total", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="ex_total",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="nb_total", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="nb_total",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="auto_ex", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="auto_ex",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="medium_ex", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="medium_ex",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="heavy_ex", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="heavy_ex",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="auto_nb", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="auto_nb",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="medium_nb", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="medium_nb",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="heavy_nb", 
-#         field_type="SHORT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="heavy_ex",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="med_pct", 
-#         field_type="FLOAT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="med_pct",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
-#     af(in_table=existing_roadways, 
-#         field_name="hvy_pct", 
-#         field_type="FLOAT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=None,
-#         field_alias="hvy_pct",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
+def create_proposed_roadway(input_folder):
+    f = "proposed_roadways"
+    writer = shapefile2.Writer(os.path.join(input_folder, f), shapeType=shapefile2.POLYLINEZ)
+    writer.field("road_name", "C", size=32)
+    writer.field("bld_traf", "N")
+    writer.field("div_lanes", "N")
+    writer.field("speed", "N")
+    writer.field("bld_total", "N")
+    writer.field("auto_bld", "N")
+    writer.field("med_bld", "N")
+    writer.field("heavy_bld", "N")
+    writer.field("heavy_pct", "N")
+    writer.field("medium_pct", "N")
+    writer.field("project", "C", size=100)
 
 # def create_proposed_roadway(input_folder):
 #     proposed_roadways = cf(out_path=input_folder,
