@@ -93,26 +93,12 @@ def create_barrier(input_folder):
     writer.field("init_hgt", "N")
     writer.field("project", "C", size=100)
 
-# def create_terrain_line(input_folder):
-#     terrain_line = cf(out_path=input_folder,
-#         out_name="terrain_line",
-#         geometry_type="POLYLINE",
-#         template=None,
-#         has_m="ENABLED",
-#         has_z="ENABLED",
-#         spatial_reference=None
-#     )
-#     af(in_table=terrain_line, 
-#         field_name="name", 
-#         field_type="TEXT",
-#         field_precision=None,
-#         field_scale=None, 
-#         field_length=32,
-#         field_alias="name",
-#         field_is_nullable="NULLABLE",
-#         field_is_required="NON_REQUIRED",
-#         field_domain=None
-#     )
+def create_terrain_line(input_folder):
+    f = "terrain_line"
+    writer.shapefile2.Writer(os.path.join(input_folder), f), shapeType=shapefile2.POLYLINEZ)
+    writer.field("name", "C", 32)
+    writer.field("project", "C", 100)
+
 
 # def create_study_area(input_folder):
 #     study_area = cf(out_path=input_folder,
