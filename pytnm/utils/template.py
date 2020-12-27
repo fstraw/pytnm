@@ -25,7 +25,7 @@ import shapefile
 def create_receivers(input_folder):
     f = "receiver"
     fn = os.path.join(input_folder, f)
-    writer = shapefile.Writer(os.path.join(input_folder, f), shapeType=shapefile.POINTZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POINTZ)
     writer.field("rec_id", "C", size=10)
     writer.field("x", "N")
     writer.field("y", "N")
@@ -47,11 +47,12 @@ def create_receivers(input_folder):
     writer.field("bar_name", "C", size=10)
     writer.field("bar_reduct", "N")
     writer.field("project", "C", size=25)
-    return F"{fn}.shp"
+    return f"{fn}.shp"
 
 def create_existing_roadway(input_folder):
     f = "existing_roadway"
-    writer = shapefile.Writer(os.path.join(input_folder, f), shapeType=shapefile.POLYLINEZ)
+    fn = os.path.join(input_folder, f)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYLINEZ)
     writer.field("road_name", "C", size=32)
     writer.field("exist_traf", "N")
     writer.field("nobld_traf", "N")
@@ -68,6 +69,7 @@ def create_existing_roadway(input_folder):
     writer.field("heavy_pct", "N")
     writer.field("medium_pct", "N")
     writer.field("project", "C", size=100)
+    return f"{fn}.shp"
 
 def create_proposed_roadway(input_folder):
     f = "proposed_roadways"

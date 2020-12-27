@@ -16,4 +16,9 @@ INPUT_FOLDER = "./"
 class TestCreateReceivers:
     def test_creates_receiver_shapefile(self):
         receivers = t.create_receivers(INPUT_FOLDER)
-        assert exists(receivers) == True
+        assert exists(receivers)
+
+class TestCreateExistingRoadway:
+    def test_creates_existing_roadway_shapefile(self):
+        existing_roadway = t.create_existing_roadway(INPUT_FOLDER)
+        assert exists(existing_roadway)
