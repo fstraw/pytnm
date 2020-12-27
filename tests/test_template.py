@@ -32,3 +32,38 @@ class TestCreateBarrier:
     def test_creates_barrier_shapefile(self):
         barrier = t.create_barrier(INPUT_FOLDER)
         assert exists(barrier)
+
+class TestCreateTerrainLine:
+    def test_creates_terrain_line_shapefile(self):
+        terrain_line = t.create_terrain_line(INPUT_FOLDER)
+        assert exists(terrain_line)
+
+class TestCreateStudyArea:
+    def test_creates_study_area_shapefile(self):
+        study_area = t.create_study_area(INPUT_FOLDER)
+        assert exists(study_area)
+
+class TestCreateStudyReceivers:
+    def test_creates_study_receivers_shapefile(self):
+        study_receivers = t.create_study_receivers(INPUT_FOLDER)
+        assert exists(study_receivers)
+
+class TestCreateFieldMeasurements:
+    def test_creates_field_measurement_shapefile(self):
+        field_measurement = t.create_field_measurements(INPUT_FOLDER)
+        assert exists(field_measurement)
+
+class TestCreateGroundArea:
+    def test_creates_ground_area_shapefile(self):
+        ground_area = t.create_ground_area(INPUT_FOLDER)
+        assert exists(ground_area)
+
+class TestCreateTreeZone:
+    def test_creates_tree_zone_shapefile(self):
+        tree_zone = t.create_tree_zone(INPUT_FOLDER)
+        assert exists(tree_zone)
+
+class TestCreateBuildingRow:
+    def test_creates_building_row_shapefile(self):
+        building_row = t.create_building_row(INPUT_FOLDER)
+        assert exists(building_row)
