@@ -90,7 +90,8 @@ def create_proposed_roadway(input_folder):
 
 def create_barrier(input_folder):
     f = "barrier"
-    writer = shapefile.Writer(os.path.join(input_folder, f), shapeType=shapefile.POLYLINEZ)
+    fn = os.path.join(input_folder, f)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYLINEZ)
     writer.field("name", "C", size=32)
     writer.field("feasible", "C", size=1)
     writer.field("reasonable", "C", size=1)
@@ -98,6 +99,7 @@ def create_barrier(input_folder):
     writer.field("pert_num", "N")
     writer.field("init_hgt", "N")
     writer.field("project", "C", size=100)
+    return f"{fn}.shp"
 
 def create_terrain_line(input_folder):
     f = "terrain_line"

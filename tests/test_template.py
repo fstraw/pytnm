@@ -27,3 +27,8 @@ class TestCreateProposedRoadway:
     def test_creates_proposed_roadway_shapefile(self):
         proposed_roadway = t.create_proposed_roadway(INPUT_FOLDER)
         assert exists(proposed_roadway)
+
+class TestCreateBarrier:
+    def test_creates_barrier_shapefile(self):
+        barrier = t.create_barrier(INPUT_FOLDER)
+        assert exists(barrier)
