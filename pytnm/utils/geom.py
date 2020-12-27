@@ -169,7 +169,7 @@ def project_point(x, y, from_spatial_reference, to_spatial_reference):
 #     return max_coords 
 
 
-if __name__ == '__main__':
-    x = 123
-    y = 456
-    print(project_point(x, y, 3857, 4326))
+# if __name__ == '__main__':
+#     x = 123
+#     y = 456
+#     print(project_point(x, y, 3857, 4326))
