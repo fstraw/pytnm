@@ -24,6 +24,7 @@ import shapefile
     
 def create_receivers(input_folder):
     f = "receiver"
+    fn = os.path.join(input_folder, f)
     writer = shapefile.Writer(os.path.join(input_folder, f), shapeType=shapefile.POINTZ)
     writer.field("rec_id", "C", size=10)
     writer.field("x", "N")
@@ -46,6 +47,7 @@ def create_receivers(input_folder):
     writer.field("bar_name", "C", size=10)
     writer.field("bar_reduct", "N")
     writer.field("project", "C", size=25)
+    return F"{fn}.shp"
 
 def create_existing_roadway(input_folder):
     f = "existing_roadway"
