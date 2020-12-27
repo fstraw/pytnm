@@ -22,3 +22,8 @@ class TestCreateExistingRoadway:
     def test_creates_existing_roadway_shapefile(self):
         existing_roadway = t.create_existing_roadway(INPUT_FOLDER)
         assert exists(existing_roadway)
+
+class TestCreateProposedRoadway:
+    def test_creates_proposed_roadway_shapefile(self):
+        proposed_roadway = t.create_proposed_roadway(INPUT_FOLDER)
+        assert exists(proposed_roadway)

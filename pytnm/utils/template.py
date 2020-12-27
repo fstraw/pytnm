@@ -73,7 +73,8 @@ def create_existing_roadway(input_folder):
 
 def create_proposed_roadway(input_folder):
     f = "proposed_roadways"
-    writer = shapefile.Writer(os.path.join(input_folder, f), shapeType=shapefile.POLYLINEZ)
+    fn = os.path.join(input_folder, f)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYLINEZ)
     writer.field("road_name", "C", size=32)
     writer.field("bld_traf", "N")
     writer.field("div_lanes", "N")
@@ -85,6 +86,7 @@ def create_proposed_roadway(input_folder):
     writer.field("heavy_pct", "N")
     writer.field("medium_pct", "N")
     writer.field("project", "C", size=100)
+    return f"{fn}.shp"
 
 def create_barrier(input_folder):
     f = "barrier"
