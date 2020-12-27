@@ -1,19 +1,26 @@
-try:
-	from setuptools import setup
-except ImportError:
-	from distutils.core import setup
+import pathlib
+from setuptools import setup
 
-config = {
-	'description': 'FHWA\'s TNM 2.5 Toolkit',
-	'author': 'Brandon Batt',		
-	'author_email': 'brbatt@gmail.com',
-	'version': '0.5',
-	'install_requires': ['openpyxl'],
-	'tests_require': ['pytest'],
-	'packages': ['pytnm'],
-	'package_dir': {'pytnm': 'pytnm'},
-	'scripts': [],
-	'name': 'pytnm'
-}
+HERE = pathlib.Path(__file__).parent
 
-setup(**config)
+README = (HERE / "README.md").read_text()
+
+setup(
+    name="pytnm",
+    version="1.0.0",
+    description="FHWA TNM 2.5 Geospatial Toolkit",
+    long_description=README,
+    long_description_content_type="text/markdown",
+    url="https://github.com/fstraw/pytnm",
+    author="Brandon Batt",
+    author_email="brbatt@gmail.com",
+    license="MIT",
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+    ],
+    packages=["pytnm"],
+    include_package_data=True,
+    install_requires=["openpyxl", "pyshp"],
+)

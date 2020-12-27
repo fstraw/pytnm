@@ -1,9 +1,5 @@
 import os
-import arcpy
-from arcpy.da import SearchCursor
-
-from .validation import validate_roadway_fields
-
+import shapefile
 
 def roadway_separator():
     """Syntax for separating individual roadways in STAMINA format
@@ -34,14 +30,25 @@ def _write_roadway_points(line_geom):
     """
     point_strings = ""
     point_strings += roadway_separator()
-    for part in line_geom:
-        for pnt_number, pnt in enumerate(part):
-            x = round(pnt.X, 1) 
-            y = round(pnt.Y, 1)
-            z = round(pnt.Z, 1)            
-            point_strings += "'Point{}' {} {} {} 0\n".format(pnt_number, x, y, z)
+    elevation_list = line_geom.z # z values read separately from xy data
+    for point_number, point in enumerate(line_geom.points):
+        print(point)
+        x = round(point[0], 1) 
+        y = round(point[1], 1)
+        z = round(elevation_list[point_number], 1)            
+        point_strings += "'Point{}' {} {} {} 0\n".format(point_number, x, y, z)
         point_strings += roadway_separator()
         return point_strings
+
+def validate_roadway_field(condition):
+    if condition == "BUILD":
+        return ("auto_bld", "medium_bld", "heavy_bld")
+    elif condition == "EXISTING":
+        return ("auto_ex", "medium_ex", "heavy_ex")
+    elif condition == "NO_BUILD":
+        return ("auto_nb", "medium_nb", "heavy_nb")
+    else:
+        raise ValueError("Feature class must include fields: bld_total, ex_total, nb_total")
 
 def _write_roadways(roadway_feature_class, condition):
     """Writes roadway feature class to STAMINA syntax
@@ -52,23 +59,23 @@ def _write_roadways(roadway_feature_class, condition):
     Returns:
         [string] -- [roadways]
     """
-    flds = validate_roadway_fields(roadway_feature_class, condition.upper()) 
-    roadway_count = len([row for row in SearchCursor(roadway_feature_class, "*")])
-    with SearchCursor(roadway_feature_class, flds) as cursor:
+
+    roadway_count = len([row for row in shapefile.Reader(roadway_feature_class)])
+    with shapefile.Reader(roadway_feature_class) as roadways:
         roadway_string = "2,{}\n".format(roadway_count)
-        for row in sorted(cursor, key=lambda row: row[flds.index("road_name")]):
-            road = row[0]
-            speed = row[1]
-            auto = round(row[2], 0)
-            medium = round(row[3], 0)
-            heavy = round(row[4], 0)
-            geometry = row[5]
+        flds = validate_roadway_field(condition)
+        for row in roadways.shapeRecords():
+            road = row.record["road_name"]
+            speed = row.record["speed"]
+            auto = round(row.record[flds[0]], 0)
+            medium = round(row.record[flds[1]], 0)
+            heavy = round(row.record[flds[2]], 0)
             roadway_string += "{}\n".format(road)
             roadway_string += "CARS {} {}\n".format(auto, speed)
             roadway_string += "MT {} {}\n".format(medium, speed)
             roadway_string += "HT {} {}\n".format(heavy, speed)
-            roadway_string += _write_roadway_points(geometry)
-        return roadway_string
+            roadway_string += _write_roadway_points(row.shape)
+        return roadway_string 
 
 def _write_barrier_points(line_geom, barrier_info=None):
     """Converts Polyline to STAMINA syntax
@@ -87,20 +94,20 @@ def _write_barrier_points(line_geom, barrier_info=None):
     if barrier_info:
         PERTURBATION_INCREMENT = barrier_info["pert_inc"]
         NUMBER_OF_PERTURBATIONS = barrier_info["pert_num"]    
-        BARRIER_INITIAL_HEIGHT = barrier_info["init_hgt"]
-    for part in line_geom:
-        for pnt_number, pnt in enumerate(part):
-            x = round(pnt.X, 1)
-            y = round(pnt.Y, 1)
-            z = round(pnt.Z, 1)
-            barrier_height = z + BARRIER_INITIAL_HEIGHT
-            if pnt_number == 0:
-                point_strings += "'Point{}' {} {} {} {} {} {}\n".format(
-                    pnt_number, x, y, barrier_height, z, PERTURBATION_INCREMENT, NUMBER_OF_PERTURBATIONS)                
-            else:
-                point_strings += "'Point{}' {} {} {} {}\n".format(pnt_number, x, y, barrier_height, z)
-        point_strings += barrier_separator()
-        return point_strings
+        BARRIER_INITIAL_HEIGHT = barrier_info["init_hgt"] #TODO: cannot be null, need to account for it
+    elevation_list = line_geom.z # z values read separately from xy data
+    for point_number, point in enumerate(line_geom.points):
+        x = round(point[0], 1) 
+        y = round(point[1], 1)
+        z = round(elevation_list[point_number], 1) 
+        barrier_height = z + BARRIER_INITIAL_HEIGHT
+        if point_number == 0:
+            point_strings += "'Point{}' {} {} {} {} {} {}\n".format(
+                point_number, x, y, barrier_height, z, PERTURBATION_INCREMENT, NUMBER_OF_PERTURBATIONS)                
+        else:
+            point_strings += "'Point{}' {} {} {} {}\n".format(point_number, x, y, barrier_height, z)
+    point_strings += barrier_separator()
+    return point_strings
 
 def _write_barriers(barrier_feature_class):
     """Creates string of barrier attributes
@@ -108,17 +115,17 @@ def _write_barriers(barrier_feature_class):
     Arguments:
         barrier_feature_class {String} -- Path to feature class        
     """
-    barrier_count = len([row for row in SearchCursor(barrier_feature_class, "*")])
-    with SearchCursor(barrier_feature_class, ("name", "SHAPE@", "pert_inc", "pert_num", "init_hgt")) as cursor:
+    barrier_count = len([row for row in shapefile.Reader(barrier_feature_class)])
+    with shapefile.Reader(barrier_feature_class) as barriers:
         barrier_string = "3,{}\n".format(barrier_count)
-        for row in cursor:
+        for row in barriers.shapeRecords():
             barrier_info = {
-                "pert_inc": row[2],
-                "pert_num": row[3],
-                "init_hgt": row[4]
+                "pert_inc": row.record["pert_inc"],
+                "pert_num": row.record["pert_num"],
+                "init_hgt": row.record["init_hgt"]
                 }
-            name = row[0]
-            geometry = row[1]
+            name = row.record["name"]
+            geometry = row.shape
             barrier_string += "{}\n".format(name)
             barrier_string += _write_barrier_points(geometry, barrier_info)
         return barrier_string
@@ -130,17 +137,16 @@ def _write_receivers(receiver_feature_class):
     Arguments:
         receiver_feature_class {[String]} -- Path to receiver feature class
     """
-    receiver_count = len([row for row in SearchCursor(receiver_feature_class, "*")])
+    receiver_count = len([row for row in shapefile.Reader(receiver_feature_class)])
     receiver_string = "5,{}\n".format(receiver_count)
-    receiver_string += "RECEIVERS\n"
-    flds = ["rec_id", "bldg_hgt", "SHAPE@X", "SHAPE@Y", "SHAPE@Z", "Id"]
-    with SearchCursor(receiver_feature_class, flds) as cursor:
-        for row in sorted(cursor, key=lambda row: row[flds.index("Id")]): # sort by Id in shapefile          
-            rec_id = row[0] # TODO: if no rec id, .dat file does not import properly into TNM 
-            bldg_hgt = row[1]            
-            x = round(row[2], 1)
-            y = round(row[3], 1)
-            z = round(row[4], 1) + bldg_hgt
+    receiver_string += "RECEIVERS\n"   
+    with shapefile.Reader(receiver_feature_class) as receivers:
+        for row in receivers.shapeRecords():         
+            rec_id = row.record["rec_id"] # TODO: if no rec id, .dat file does not import properly into TNM 
+            bldg_hgt = row.record["bldg_hgt"]            
+            x = round(row.shape.points[0][0], 1)
+            y = round(row.shape.points[0][1], 1)
+            z = round(row.shape.z[0], 1) + bldg_hgt
             receiver_string += "'{}' {} {} {}\n".format(rec_id, x, y, z)
         return receiver_string
 
@@ -172,4 +178,11 @@ def write_stamina_file(file_path, condition, roadways=None, barriers=None, recei
     return file_path
 
 if __name__ == '__main__':
-    pass
+    # print(_write_roadways(r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\existing_roadway.shp", "EXISTING"))
+    # print(_write_barriers(r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\barrier.shp"))
+    # print(_write_receivers(r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\receiver.shp"))
+    write_stamina_file(r"C:\TNM25",
+    "EXISTING", 
+    roadways=r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\existing_roadway.shp",
+    receivers=r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\receiver.shp",
+    barriers=r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\barrier.shp")
