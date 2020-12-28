@@ -7,7 +7,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pytnm",
-    version="1.0.0",
+    version="1.0.1",
     description="FHWA TNM 2.5 Geospatial Toolkit",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -20,7 +20,10 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
     ],
-    packages=find_packages(exclude=("tests",)),
-    include_package_data=True,
+    packages=[
+		"pytnm",
+		"pytnm.utils",
+		"pytnm.utils.report"
+	],
     install_requires=["openpyxl", "pyshp"],
 )

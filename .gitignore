@@ -54,3 +54,4 @@ Temporary Items
 .vscode
 .pytest_cache/
 env/
+__pycache__/
