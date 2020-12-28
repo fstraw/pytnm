@@ -8,7 +8,7 @@ from pytnm.utils import shapefile2
 
 # https://www.esri.com/library/whitepapers/pdfs/shapefile2.pdf
 # NULL = 0
-# POINT = 1py
+# POINT = 1
 # POLYLINE = 3
 # POLYGON = 5
 # MULTIPOINT = 8
