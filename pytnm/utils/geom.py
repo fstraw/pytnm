@@ -9,14 +9,14 @@ from pyproj import CRS, Transformer
 # from arcpy.da import SearchCursor, UpdateCursor
 
 
-# def project_point(x, y, from_spatial_reference, to_spatial_reference):
-#     """
-#     new_point = Point(x, y)
-#     new_point_geom = PointGeometry(new_point, from_spatial_reference)
-#     projected_point = new_point_geom.projectAs(to_spatial_reference).firstPoint
-#     new_x = projected_point.X
-#     new_y = projected_point.Y
-#     return (new_x, new_y)
+def project_point(x, y, from_spatial_reference, to_spatial_reference):
+    """  """
+    new_point = Point(x, y)
+    new_point_geom = PointGeometry(new_point, from_spatial_reference)
+    projected_point = new_point_geom.projectAs(to_spatial_reference).firstPoint
+    new_x = projected_point.X
+    new_y = projected_point.Y
+    return (new_x, new_y)
 
 # def _get_z_value(coords, raster):
 #     coords_string = "{} {}".format(*coords)
