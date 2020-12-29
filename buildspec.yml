@@ -1,0 +1,16 @@
+version: 0.2
+
+env:
+  parameter-store:
+    PYPI_PASSWORD: codebuild-pytnm-pypi
+
+phases:
+  pre_build:
+    commands:
+      - pip install -r requirements.txt
+  build:
+    commands:
+      - python setup.py sdist bdist_wheel
+  post_build:
+    commands:
+      - twine upload -u __token__ -p $PYPI_PASSWORD dist/*
