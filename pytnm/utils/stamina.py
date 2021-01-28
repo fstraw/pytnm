@@ -32,13 +32,11 @@ def _write_roadway_points(line_geom):
     point_strings += roadway_separator()
     elevation_list = line_geom.z # z values read separately from xy data
     for point_number, point in enumerate(line_geom.points):
-        print(point)
         x = round(point[0], 1) 
         y = round(point[1], 1)
         z = round(elevation_list[point_number], 1)            
         point_strings += "'Point{}' {} {} {} 0\n".format(point_number, x, y, z)
-        point_strings += roadway_separator()
-        return point_strings
+    return point_strings
 
 def validate_roadway_field(condition):
     if condition == "BUILD":
@@ -75,6 +73,7 @@ def _write_roadways(roadway_feature_class, condition):
             roadway_string += "MT {} {}\n".format(medium, speed)
             roadway_string += "HT {} {}\n".format(heavy, speed)
             roadway_string += _write_roadway_points(row.shape)
+            roadway_string += roadway_separator()
         return roadway_string 
 
 def _write_barrier_points(line_geom, barrier_info=None):
@@ -178,11 +177,4 @@ def write_stamina_file(file_path, condition, roadways=None, barriers=None, recei
     return file_path
 
 if __name__ == '__main__':
-    # print(_write_roadways(r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\existing_roadway.shp", "EXISTING"))
-    # print(_write_barriers(r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\barrier.shp"))
-    # print(_write_receivers(r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\receiver.shp"))
-    write_stamina_file(r"C:\TNM25",
-    "EXISTING", 
-    roadways=r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\existing_roadway.shp",
-    receivers=r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\receiver.shp",
-    barriers=r"C:\Users\Brandon\projects\pytnm\tests\test_files\DATA\barrier.shp")
+    pass
