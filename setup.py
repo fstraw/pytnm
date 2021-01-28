@@ -7,7 +7,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pytnm",
-    version="1.0.4",
+    version="1.0.5",
     description="FHWA TNM 2.5 Geospatial Toolkit",
     long_description=README,
     long_description_content_type="text/markdown",
