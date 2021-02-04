@@ -13,9 +13,9 @@ output_directory = "~/projects/tnm_project"
 # create receiver template
 template.create_receivers(output_directory)
 # create existing roadway template template
-template.create_existing_roadways(output_directory)
+template.create_existing_roadway(output_directory)
 # create noise barrier template
-template.create_barriers(output_directory)
+template.create_barrier(output_directory)
 ```
 ### Convert geospatial template files into STAMNA file, for importing into TNM 2.5
 
