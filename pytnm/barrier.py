@@ -311,17 +311,13 @@ class Analysis(object):
 	to two separate worksheets in the ".xlsx" workbook.
 	
 	:param wbname: ".xlsx" file on disk (i.g. "Barriers.xlsx")
-	:param barsheet: worksheet in ".xlsx" containing Barrier Design Table
 	:param sndsheet: "worksheet in ".xlsx" containing Sound Level Results
 	:param barriercost: cost of barrier design, as reported by TNM 2.5
 	"""
 
-	def __init__(self, wbname, barsheet, sndsheet, barcost=0):
+	def __init__(self, wbname, sndsheet, barcost=0):
 		self._wbname = wbname
-		self._barsheet = barsheet
 		self._sndsheet = sndsheet
-		if barsheet == sndsheet:
-			raise ValueError("Worksheets cannot be identical!")
 		self.barriercost = barcost
 		self._barrecs = self._wbhandler(barsheet)
 		self._sndrecs = self._wbhandler(sndsheet)
@@ -360,10 +356,6 @@ class Analysis(object):
 		if not ws:
 			raise ValueError("Excel worksheet not found!" + 
                                        "Is it spelled correctly?")
-		if sht == self._barsheet:
-			lastrow = ws.max_row
-			#assumes copied from TNM bar sound results in cell A1
-			datarange = 'B18:L{}'.format(lastrow)
 		elif sht == self._sndsheet:
 			#omit last 8 rows in snd results
 			lastrow = ws.max_row - 8
@@ -504,16 +496,7 @@ class Analysis(object):
 if __name__ == '__main__':
 	os.chdir(os.path.dirname(__file__))
 	model_xlsx = '../files/tnm_model.xlsx'
-	build_model = Model(model_xlsx)
-	roadways = build_model.roadways	
-	# for roadway in roadways:
-	# 	print(roadway.traffic.auto.speed)
-	# 	print(roadway.traffic.medium.speed)
-	# 	print(roadway.traffic.heavy.speed)
-	# receivers = build_model.receivers	
-	# for receiver in receivers:
-	# 	print(receiver)
-	barriers = build_model.barriers
-	print(barriers)
-	for barrier in barriers:
-		print(barrier)
+	barrier_xlsx = '../files/CNE_A.xlsx'
+	barrier_analysis = Analysis(barrier_xlsx, "CNE_A_WB9", "CNE_A_SND")
+	print(barrier_analysis.cost_per_benefit())
+
