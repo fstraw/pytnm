@@ -498,6 +498,11 @@ class LouisianaAnalysis(Analysis):
 		return barrier_names
 	
 	def _barrier_infos(self):
+		"""[summary]
+		{ barrier: [(hgt, length, sqft)] }
+		Returns:
+			[list]: [[{ barrier: [(hgt, length, sqft)] }]]
+		"""
 		barrier_list = []
 		barrier_info = {}
 		barrier_tag = ""
@@ -524,8 +529,24 @@ class LouisianaAnalysis(Analysis):
 				barrier_info = {}
 		return barrier_list
 
-	## { barrier: [(hgt, length, sqft)] }
-	## { barrier: {hgt: sqfootage} }
+	def _barrier_dimensions(self):
+		"""[summary]
+
+		Returns:
+			[dict]: [{ barrier: {hgt: sqfootage, hgt:sqfootage, ...} }]
+		"""
+		barrier_info = {}
+		for barrier in self._barrier_infos():
+			barrier_name = [k for k in barrier.keys()][0]
+			barrier_segment_info = {}
+			segment_descriptions_list = barrier.values()
+			for segment_descriptions in segment_descriptions_list:
+				unique_heights = set([i[1] for i in segment_descriptions if i[1]]) #exclude zero height segments
+				for height in unique_heights:
+					square_footage = sum([i[2] for i in segment_descriptions if i[1] == height])
+					barrier_segment_info[height] = square_footage
+			barrier_info[barrier_name] = barrier_segment_info
+		return barrier_info
 
 if __name__ == '__main__':
 	os.chdir(os.path.dirname(__file__))
@@ -533,6 +554,6 @@ if __name__ == '__main__':
 	barrier_xlsx = '../files/CNE_A.xlsx'
 	# barrier_analysis = Analysis(barrier_xlsx, "CNE_A_WB9", "CNE_A_SND")
 	barrier_analysis = LouisianaAnalysis(barrier_xlsx, "CNE_A_SND")
-	print(barrier_analysis._barrier_infos())
+	print(barrier_analysis._barrier_dimensions())
 
 
