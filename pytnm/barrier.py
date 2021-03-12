@@ -318,17 +318,11 @@ class Analysis(object):
 	def __init__(self, wbname, sndsheet, barcost=0):
 		self._wbname = wbname
 		self._sndsheet = sndsheet
-		self.barriercost = barcost
-		self._barrecs = self._wbhandler(barsheet)
+		self.barriercost = barcost		
 		self._sndrecs = self._wbhandler(sndsheet)
 		"""Receivers listed in the Sound Results worksheet"""
-		self.snd_rec_list = [
-                                  (i[0].value, i[2].value, i[8].value) 
-                                      for i in self._sndrecs
-                               ]
-		self.impacted_recs = [(i[0], i[1]) for i in self.recs_analysis 
-                                      if i[4] != " ----"
-                                ]
+		self.snd_rec_list = [(i[0].value.strip(), i[2].value, i[8].value.strip()) for i in self._sndrecs]
+		self.impacted_recs = [i for i in self.snd_rec_list if i[2] != "----"]
 		self.impact_num = sum([tup[1] for tup in self.impacted_recs])
 		self.du_analysis = sum([tup[1] for tup in self.recs_analysis])
 		self.benefitted =  [
@@ -356,11 +350,10 @@ class Analysis(object):
 		if not ws:
 			raise ValueError("Excel worksheet not found!" + 
                                        "Is it spelled correctly?")
-		elif sht == self._sndsheet:
-			#omit last 8 rows in snd results
-			lastrow = ws.max_row - 8
-			datarange = 'B20:N{}'.format(lastrow)
-		reclist = list(ws.iter_rows(range_string=datarange))
+		# omit last 8 rows in snd results
+		lastrow = ws.max_row - 8
+		# limit to appropriate columns 
+		reclist = list(ws.iter_rows(min_col=2, max_col=14, min_row=20, max_row=lastrow))
 		return reclist
 	@property		
 	def recs_analysis(self):
@@ -368,21 +361,9 @@ class Analysis(object):
 		List receivers, DU, barrier reduction value, reduction goal, and
 		impact status in chosen barrier analysis
 		"""
-		barreclist = self._barrecs
 		sndreclist = self._sndrecs
-		r = []
-		for barrec in barreclist:
-			rec = barrec[0].value
-			barred = barrec[3].value
-			redgoal = barrec[4].value
-			for sndrec in sndreclist:
-				if rec == sndrec[0].value:
-					du = sndrec[2].value
-					impstat = sndrec[8].value
-					r.append((rec, du, barred, redgoal, impstat))
-				else:
-					pass
-		return sorted(r)
+		return [("1A", 1, 5.5, 8, " ----")]
+		# return (rec, du, barred, redgoal, impstat)
 	@property
 	def benefits(self):
 		"""
@@ -493,10 +474,65 @@ class Analysis(object):
 # 		else:
 # 			return False
 
+class LouisianaAnalysis(Analysis):
+
+	def barrier_segments(self):
+		"""
+		"""
+		wb = p.load_workbook(self._wbname)
+		ws = wb.get_sheet_by_name("Barrier_Segments")
+		if not ws:
+			raise ValueError("Excel worksheet not found!" + 
+                                       "Is it spelled correctly?")
+		lastrow = ws.max_row
+		# limit to appropriate columns 
+		barrierlist = list(ws.iter_rows(min_col=2, max_col=14, min_row=16, max_row=lastrow))
+		return barrierlist
+
+	def _barrier_names(self):
+		barrier_names = {}		
+		for barrier in self.barrier_segments():
+			barrier_name = barrier[0].value
+			if barrier_name:
+				barrier_names[barrier_name] = {}		
+		return barrier_names
+	
+	def _barrier_infos(self):
+		barrier_list = []
+		barrier_info = {}
+		barrier_tag = ""
+		row_count = (len(self.barrier_segments()))
+		for idx, row in enumerate(self.barrier_segments()):
+			barrier_name = row[0].value
+			barrier_point = row[4].value
+			barrier_height = row[6].value
+			barrier_length = row[8].value
+			barrier_sq_footage = row[9].value			
+			if (barrier_name and barrier_point): # check for barrier name or last row
+				barrier_tag = barrier_name.strip()
+				barrier_dimensions = (barrier_length, barrier_height, barrier_sq_footage)
+				barrier_info[barrier_name.strip()] = []			
+				barrier_info[barrier_name.strip()].append(barrier_dimensions)
+			elif barrier_point:
+				barrier_dimensions = (barrier_length, barrier_height, barrier_sq_footage)
+				if (idx == row_count - 1): # deal with last row					
+					barrier_info[barrier_tag].append(barrier_dimensions)
+					barrier_list.append(barrier_info)
+				barrier_info[barrier_tag].append(barrier_dimensions)
+			elif not barrier_point:				
+				barrier_list.append(barrier_info)			
+				barrier_info = {}
+		return barrier_list
+
+	## { barrier: [(hgt, length, sqft)] }
+	## { barrier: {hgt: sqfootage} }
+
 if __name__ == '__main__':
 	os.chdir(os.path.dirname(__file__))
 	model_xlsx = '../files/tnm_model.xlsx'
 	barrier_xlsx = '../files/CNE_A.xlsx'
-	barrier_analysis = Analysis(barrier_xlsx, "CNE_A_WB9", "CNE_A_SND")
-	print(barrier_analysis.cost_per_benefit())
+	# barrier_analysis = Analysis(barrier_xlsx, "CNE_A_WB9", "CNE_A_SND")
+	barrier_analysis = LouisianaAnalysis(barrier_xlsx, "CNE_A_SND")
+	print(barrier_analysis._barrier_infos())
+
 
