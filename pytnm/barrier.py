@@ -513,7 +513,7 @@ class LouisianaAnalysis(Analysis):
 			barrier_height = row[6].value
 			barrier_length = row[8].value
 			barrier_sq_footage = row[9].value			
-			if (barrier_name and barrier_point): # check for barrier name or last row
+			if (barrier_name and barrier_point): # check for barrier name
 				barrier_tag = barrier_name.strip()
 				barrier_dimensions = (barrier_length, barrier_height, barrier_sq_footage)
 				barrier_info[barrier_name.strip()] = []			
@@ -523,10 +523,12 @@ class LouisianaAnalysis(Analysis):
 				if (idx == row_count - 1): # deal with last row					
 					barrier_info[barrier_tag].append(barrier_dimensions)
 					barrier_list.append(barrier_info)
-				barrier_info[barrier_tag].append(barrier_dimensions)
+				else:
+					barrier_info[barrier_tag].append(barrier_dimensions)
 			elif not barrier_point:				
-				barrier_list.append(barrier_info)			
+				barrier_list.append(barrier_info)		
 				barrier_info = {}
+		print(barrier_list)
 		return barrier_list
 
 	def _barrier_dimensions(self):
@@ -535,7 +537,7 @@ class LouisianaAnalysis(Analysis):
 		Returns:
 			[dict]: [{ barrier: {hgt: sqfootage, hgt:sqfootage, ...} }]
 		"""
-		barrier_info = {}
+		barrier_info = {}		
 		for barrier in self._barrier_infos():
 			barrier_name = [k for k in barrier.keys()][0]
 			barrier_segment_info = {}
@@ -723,11 +725,10 @@ def barrier_cost(bar):
 
 if __name__ == '__main__':
 	os.chdir(os.path.dirname(__file__))
-	barrier_xlsx = '../files/CNE_P.xlsx'
+	barrier_xlsx = '../files/CNE_P2.xlsx'
 	# barrier_analysis = Analysis(barrier_xlsx, "CNE_A_WB9", "CNE_A_SND")
-	barrier_analysis = LouisianaAnalysis(barrier_xlsx, "CNE_P_SND")
-	bar = barrier_analysis._barrier_dimensions()['EB5']
-	print(bar)
+	barrier_analysis = LouisianaAnalysis(barrier_xlsx, "CNE_P2_SND")
+	bar = barrier_analysis._barrier_dimensions()['EB6']
 	print(barrier_cost(bar))
 	# barrier_analysis.barrier_cost(bar)
 	# print(wb9a)
