@@ -321,7 +321,7 @@ class Analysis(object):
 		self.barriercost = barcost		
 		self._sndrecs = self._wbhandler(sndsheet)
 		"""Receivers listed in the Sound Results worksheet"""
-		self.snd_rec_list = [(i[0].value.strip(), i[2].value, i[8].value.strip()) for i in self._sndrecs]
+		self.snd_rec_list = [(f"{i[0].value}".strip(), i[2].value, i[8].value.strip()) for i in self._sndrecs]
 		self.impacted_recs = [i for i in self.snd_rec_list if i[2] != "----"]
 		self.impact_num = sum([tup[1] for tup in self.impacted_recs])
 		self.du_analysis = sum([tup[1] for tup in self.recs_analysis])
@@ -548,12 +548,188 @@ class LouisianaAnalysis(Analysis):
 			barrier_info[barrier_name] = barrier_segment_info
 		return barrier_info
 
+def barrier_cost(bar):
+	total_height = 0
+	total_cost = 0
+	print(bar)
+	for hgt, total_sqft in bar.items():
+		# print(hgt, total_sqft)
+		if hgt <= 10:
+			if total_sqft <= 10000:
+				total_cost += (total_sqft * 27)
+			elif 10001 <= total_sqft <= 15000:
+				total_cost += (total_sqft * 26)
+			elif 15001 <= total_sqft <= 20000:
+				total_cost += (total_sqft * 24)
+			elif 20001 <= total_sqft <= 25000:
+				total_cost += (total_sqft * 23)
+			elif 25001 <= total_sqft <= 30000:
+				total_cost += (total_sqft * 22)
+			elif 30001 <= total_sqft <= 35000:
+				total_cost += (total_sqft * 22)
+			elif 35001 <= total_sqft <= 40000:
+				total_cost += (total_sqft * 21)
+			elif 40001 <= total_sqft <= 45000:
+				total_cost += (total_sqft * 21)
+			elif 45001 <= total_sqft <= 50000:
+				total_cost += (total_sqft * 20)
+			elif 50001 <= total_sqft <= 55000:
+				total_cost += (total_sqft * 20)
+			elif 55001 <= total_sqft <= 60000:
+				total_cost += (total_sqft * 20)
+			elif 60001 <= total_sqft <= 65000:
+				total_cost += (total_sqft * 20)
+			elif 65001 <= total_sqft <= 70000:
+				total_cost += (total_sqft * 19)
+			elif 70001 <= total_sqft <= 75000:
+				total_cost += (total_sqft * 19)
+			elif 75001 <= total_sqft <= 80000:
+				total_cost += (total_sqft * 19)
+			elif total_sqft >= 80001:
+				total_cost += (total_sqft * 19)																																														
+		elif 11 <= hgt <= 14:
+			if total_sqft <= 10000:
+				total_cost += (total_sqft * 43)
+			elif 10001 <= total_sqft <= 15000:
+				total_cost += (total_sqft * 41)
+			elif 15001 <= total_sqft <= 20000:
+				total_cost += (total_sqft * 39)
+			elif 20001 <= total_sqft <= 25000:
+				total_cost += (total_sqft * 37)
+			elif 25001 <= total_sqft <= 30000:
+				total_cost += (total_sqft * 36)
+			elif 30001 <= total_sqft <= 35000:
+				total_cost += (total_sqft * 35)
+			elif 35001 <= total_sqft <= 40000:
+				total_cost += (total_sqft * 34)
+			elif 40001 <= total_sqft <= 45000:
+				total_cost += (total_sqft * 33)
+			elif 45001 <= total_sqft <= 50000:
+				total_cost += (total_sqft * 33)
+			elif 50001 <= total_sqft <= 55000:
+				total_cost += (total_sqft * 32)
+			elif 55001 <= total_sqft <= 60000:
+				total_cost += (total_sqft * 32)
+			elif 60001 <= total_sqft <= 65000:
+				total_cost += (total_sqft * 31)
+			elif 65001 <= total_sqft <= 70000:
+				total_cost += (total_sqft * 31)
+			elif 70001 <= total_sqft <= 75000:
+				total_cost += (total_sqft * 30)
+			elif 75001 <= total_sqft <= 80000:
+				total_cost += (total_sqft * 30)
+			elif total_sqft >= 80001:
+				total_cost += (total_sqft * 30)
+		elif 15 <= hgt <= 19:
+			if total_sqft <= 10000:
+				total_cost += (total_sqft * 78)
+			elif 10001 <= total_sqft <= 15000:
+				total_cost += (total_sqft * 76)
+			elif 15001 <= total_sqft <= 20000:
+				total_cost += (total_sqft * 71)
+			elif 20001 <= total_sqft <= 25000:
+				total_cost += (total_sqft * 68)
+			elif 25001 <= total_sqft <= 30000:
+				total_cost += (total_sqft * 66)
+			elif 30001 <= total_sqft <= 35000:
+				total_cost += (total_sqft * 64)
+			elif 35001 <= total_sqft <= 40000:
+				total_cost += (total_sqft * 62)
+			elif 40001 <= total_sqft <= 45000:
+				total_cost += (total_sqft * 61)
+			elif 45001 <= total_sqft <= 50000:
+				total_cost += (total_sqft * 60)
+			elif 50001 <= total_sqft <= 55000:
+				total_cost += (total_sqft * 59)
+			elif 55001 <= total_sqft <= 60000:
+				total_cost += (total_sqft * 58)
+			elif 60001 <= total_sqft <= 65000:
+				total_cost += (total_sqft * 57)
+			elif 65001 <= total_sqft <= 70000:
+				total_cost += (total_sqft * 56)
+			elif 70001 <= total_sqft <= 75000:
+				total_cost += (total_sqft * 56)
+			elif 75001 <= total_sqft <= 80000:
+				total_cost += (total_sqft * 55)
+			elif total_sqft >= 80001:
+				total_cost += (total_sqft * 55)
+		elif 20 <= hgt <= 25:
+			if total_sqft <= 10000:
+				total_cost += (total_sqft * 151)
+			elif 10001 <= total_sqft <= 15000:
+				total_cost += (total_sqft * 145)
+			elif 15001 <= total_sqft <= 20000:
+				total_cost += (total_sqft * 136)
+			elif 20001 <= total_sqft <= 25000:
+				total_cost += (total_sqft * 130)
+			elif 25001 <= total_sqft <= 30000:
+				total_cost += (total_sqft * 126)
+			elif 30001 <= total_sqft <= 35000:
+				total_cost += (total_sqft * 122)
+			elif 35001 <= total_sqft <= 40000:
+				total_cost += (total_sqft * 119)
+			elif 40001 <= total_sqft <= 45000:
+				total_cost += (total_sqft * 117)
+			elif 45001 <= total_sqft <= 50000:
+				total_cost += (total_sqft * 115)
+			elif 50001 <= total_sqft <= 55000:
+				total_cost += (total_sqft * 113)
+			elif 55001 <= total_sqft <= 60000:
+				total_cost += (total_sqft * 111)
+			elif 60001 <= total_sqft <= 65000:
+				total_cost += (total_sqft * 110)
+			elif 65001 <= total_sqft <= 70000:
+				total_cost += (total_sqft * 108)
+			elif 70001 <= total_sqft <= 75000:
+				total_cost += (total_sqft * 107)
+			elif 75001 <= total_sqft <= 80000:
+				total_cost += (total_sqft * 106)
+			elif total_sqft >= 80001:
+				total_cost += (total_sqft * 105)
+		elif hgt >= 26:
+			if total_sqft <= 10000:
+				total_cost += (total_sqft * 229)
+			elif 10001 <= total_sqft <= 15000:
+				total_cost += (total_sqft * 221)
+			elif 15001 <= total_sqft <= 20000:
+				total_cost += (total_sqft * 208)
+			elif 20001 <= total_sqft <= 25000:
+				total_cost += (total_sqft * 199)
+			elif 25001 <= total_sqft <= 30000:
+				total_cost += (total_sqft * 192)
+			elif 30001 <= total_sqft <= 35000:
+				total_cost += (total_sqft * 186)
+			elif 35001 <= total_sqft <= 40000:
+				total_cost += (total_sqft * 182)
+			elif 40001 <= total_sqft <= 45000:
+				total_cost += (total_sqft * 178)
+			elif 45001 <= total_sqft <= 50000:
+				total_cost += (total_sqft * 175)
+			elif 50001 <= total_sqft <= 55000:
+				total_cost += (total_sqft * 172)
+			elif 55001 <= total_sqft <= 60000:
+				total_cost += (total_sqft * 169)
+			elif 60001 <= total_sqft <= 65000:
+				total_cost += (total_sqft * 167)
+			elif 65001 <= total_sqft <= 70000:
+				total_cost += (total_sqft * 165)
+			elif 70001 <= total_sqft <= 75000:
+				total_cost += (total_sqft * 163)
+			elif 75001 <= total_sqft <= 80000:
+				total_cost += (total_sqft * 161)
+			elif total_sqft >= 80001:
+				total_cost += (total_sqft * 160)
+	return total_cost
+
 if __name__ == '__main__':
 	os.chdir(os.path.dirname(__file__))
-	model_xlsx = '../files/tnm_model.xlsx'
-	barrier_xlsx = '../files/CNE_A.xlsx'
+	barrier_xlsx = '../files/CNE_P.xlsx'
 	# barrier_analysis = Analysis(barrier_xlsx, "CNE_A_WB9", "CNE_A_SND")
-	barrier_analysis = LouisianaAnalysis(barrier_xlsx, "CNE_A_SND")
-	print(barrier_analysis._barrier_dimensions())
-
+	barrier_analysis = LouisianaAnalysis(barrier_xlsx, "CNE_P_SND")
+	bar = barrier_analysis._barrier_dimensions()['EB5']
+	print(bar)
+	print(barrier_cost(bar))
+	# barrier_analysis.barrier_cost(bar)
+	# print(wb9a)
+	# print(wb9b)
 
