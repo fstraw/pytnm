@@ -15,7 +15,7 @@ packaging==20.8
 pkginfo==1.6.1
 pluggy==0.13.1
 py==1.10.0
-Pygments==2.7.3
+Pygments==2.7.4
 pyparsing==2.4.7
 pyshp==2.1.2
 pytest==6.2.1
@@ -29,5 +29,5 @@ six==1.15.0
 toml==0.10.2
 tqdm==4.55.0
 twine==3.3.0
-urllib3==1.26.2
+urllib3==1.26.5
 webencodings==0.5.1
