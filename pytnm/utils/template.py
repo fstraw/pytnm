@@ -1,12 +1,12 @@
 import os
-from pytnm.utils import shapefile2
+import shapefile
 # from arcpy import CreateFeatureclass_management as cf
 # from arcpy import AddField_management as af
 # from arcpy import env
 
 # env.overwriteOutput = True
 
-# https://www.esri.com/library/whitepapers/pdfs/shapefile2.pdf
+# https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
 # NULL = 0
 # POINT = 1
 # POLYLINE = 3
@@ -25,7 +25,7 @@ from pytnm.utils import shapefile2
 def create_receivers(input_folder):
     f = "receiver"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POINTZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POINTZ)
     writer.field("rec_id", "C", size=10)
     writer.field("x", "N")
     writer.field("y", "N")
@@ -36,23 +36,32 @@ def create_receivers(input_folder):
     writer.field("nac_cat", "C", size=1)
     writer.field("nac_lvl", "N")
     writer.field("ext_use", "C", size=1)
-    writer.field("displace", "C", size=1)
+    writer.field("alt1_disp", "C", size=1)
+    writer.field("alt2_disp", "C", size=1)
+    writer.field("alt3_disp", "C", size=1)
+    writer.field("alt4_disp", "C", size=1)
+    writer.field("alt5_disp", "C", size=1)
     writer.field("bldg_row", "N")
     writer.field("exist_snd", "N")
     writer.field("nobld_snd", "N")
-    writer.field("bld_snd", "N")
-    writer.field("ex_imp", "C", size=1)
-    writer.field("nobld_imp", "C", size=1)
-    writer.field("bld_imp", "C", size=1)
+    writer.field("alt1_snd", "N")
+    writer.field("alt2_snd", "N")
+    writer.field("alt3_snd", "N")
+    writer.field("alt4_snd", "N")
+    writer.field("alt5_snd", "N")
+    writer.field("alt1_red", "N")
+    writer.field("alt2_red", "N")
+    writer.field("alt3_red", "N")
+    writer.field("alt4_red", "N")
+    writer.field("alt5_red", "N")
     writer.field("bar_name", "C", size=10)
-    writer.field("bar_reduct", "N")
     writer.field("project", "C", size=25)
     return f"{fn}.shp"
 
 def create_existing_roadway(input_folder):
     f = "existing_roadway"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POLYLINEZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYLINEZ)
     writer.field("road_name", "C", size=32)
     writer.field("exist_traf", "N")
     writer.field("nobld_traf", "N")
@@ -74,7 +83,7 @@ def create_existing_roadway(input_folder):
 def create_proposed_roadway(input_folder):
     f = "proposed_roadways"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POLYLINEZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYLINEZ)
     writer.field("road_name", "C", size=32)
     writer.field("bld_traf", "N")
     writer.field("div_lanes", "N")
@@ -91,20 +100,24 @@ def create_proposed_roadway(input_folder):
 def create_barrier(input_folder):
     f = "barrier"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POLYLINEZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYLINEZ)
     writer.field("name", "C", size=32)
     writer.field("feasible", "C", size=1)
     writer.field("reasonable", "C", size=1)
     writer.field("pert_inc", "N")
     writer.field("pert_num", "N")
     writer.field("init_hgt", "N")
+    writer.field("alt", "C", size=10)
+    writer.field("analysis", "C", size=10)
+    writer.field("mask", "C", size=1)
+    writer.field("include_in", "C", size=1)
     writer.field("project", "C", size=100)
     return f"{fn}.shp"
 
 def create_terrain_line(input_folder):
     f = "terrain_line"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POLYLINEZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYLINEZ)
     writer.field("name", "C", size=32)
     writer.field("project", "C", size=100)
     return f"{fn}.shp"
@@ -112,7 +125,7 @@ def create_terrain_line(input_folder):
 def create_study_area(input_folder):
     f = "study_area"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POLYGONZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYGONZ)
     writer.field("name", "C", size=32)
     writer.field("project", "C", size=100)
     return f"{fn}.shp"
@@ -120,7 +133,7 @@ def create_study_area(input_folder):
 def create_study_receivers(input_folder):
     f = "study_receiver"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POINTZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POINTZ)
     writer.field("rec_id", "C", size=10)
     writer.field("x", "N")
     writer.field("y", "N")
@@ -131,7 +144,7 @@ def create_study_receivers(input_folder):
 def create_field_measurements(input_folder):
     f = "field_measurement"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POINTZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POINTZ)
     writer.field("rec_id", "C", size=10)
     writer.field("x", "N")
     writer.field("y", "N")
@@ -143,7 +156,7 @@ def create_field_measurements(input_folder):
 def create_ground_area(input_folder):
     f = "ground_zone"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POLYGONZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYGONZ)
     writer.field("name", "C", size=32)
     writer.field("type", "C", size=32)
     writer.field("project", "C", size=100)
@@ -152,7 +165,7 @@ def create_ground_area(input_folder):
 def create_tree_zone(input_folder):
     f = "tree_zone"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POLYGONZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYGONZ)
     writer.field("name", "C", size=32)
     writer.field("avg_hgt", "N")
     writer.field("project", "C", size=100)
@@ -161,7 +174,7 @@ def create_tree_zone(input_folder):
 def create_building_row(input_folder):
     f = "building_row"
     fn = os.path.join(input_folder, f)
-    writer = shapefile2.Writer(fn, shapeType=shapefile2.POLYLINEZ)
+    writer = shapefile.Writer(fn, shapeType=shapefile.POLYLINEZ)
     writer.field("name", "C", size=32)
     writer.field("avg_hgt", "N")
     writer.field("bldg_pct", "N")
