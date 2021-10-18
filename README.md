@@ -17,7 +17,7 @@ template.create_existing_roadway(output_directory)
 # create noise barrier template
 template.create_barrier(output_directory)
 ```
-### Convert geospatial template files into STAMNA file, for importing into TNM 2.5
+### Convert geospatial template files into STAMINA file, for importing into TNM 2.5
 
 ```
 from pytnm.utils import stamina
